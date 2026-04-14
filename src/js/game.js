@@ -56,7 +56,7 @@ export class Game {
 
     generateBackground() {
         let ctx = this.hugeBackground.getCtx();
-        ctx.fillStyle = '#222222';
+        ctx.fillStyle = '#333333';
         ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
 
 
@@ -65,7 +65,7 @@ export class Game {
             let x = Math.random() * this.hugeBackground.width;
             let y = Math.random() * this.hugeBackground.height;
             let size = Math.random() * 5 + 25;
-            ctx.fillStyle = '#333333' + Math.floor(0 + Math.random() * 30).toString(16);
+            ctx.fillStyle = '#444444' + Math.floor(0 + Math.random() * 30).toString(16);
             ctx.beginPath();
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();

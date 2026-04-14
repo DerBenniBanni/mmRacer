@@ -1,19 +1,24 @@
 import {GameObject} from "../gameobject.js";
 import {SpriteBuffer} from "../lib/spritebuffer.js";
+import StackedSprite from "../renderer/stackedsprite.js";
+import stackDefCarMini from "../spritestacks/car_mini.js";
 
 export class Car extends GameObject{
     constructor({x,y,rot=0}) {
         super({x,y});
         this.rot = rot; // rotation in radians
-        this.w = 50;
-        this.h = 20;
+        this.w = 60;
+        this.h = 30;
 
         this.type = 'Car';
         this.spriteBuffer = new SpriteBuffer(64, 64, 360);
+        this.renderer = new StackedSprite(stackDefCarMini);
     }
 
     render(ctx) {
-
+        this.renderer.render(ctx, this.x, this.y, this.rot);
+        return;
+/*
         for(let i = 0 ; i < 3 ; i++) {
             ctx.save();
             ctx.translate(this.x, this.y-i);
@@ -58,5 +63,7 @@ export class Car extends GameObject{
             ctx.fillRect(-this.w / 2 +(i-8), -this.h / 2, this.w -10 -(i-8)*2, this.h);
             ctx.restore();
         }
+*/
+
     }
 }
