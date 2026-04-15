@@ -12,7 +12,7 @@ export class Game {
             y: this.canvas.height / 2,
             target:null,
             offsetX:0,
-            offsetY:this.canvas.height / 4
+            offsetY:0 //this.canvas.height / 4
         };
 
         this.inputActions = {

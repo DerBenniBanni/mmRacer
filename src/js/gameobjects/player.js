@@ -37,25 +37,20 @@ export class Player extends Car {
         if(this.speed < this.maxSpeed /10) {
             return;
         }
+        let len = this.speed/10;
         ctx.save();
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rot);
         ctx.beginPath();
-        ctx.fillStyle = '#0002';
-        let x1 = (Math.random() * 4 - 2);
+        ctx.fillStyle = '#00000009';
+        let x1 = (Math.random() * 4 - 2) - len/2;
         let y1 = 15 + (Math.random() * 4 - 2);
         let size1 = Math.random() * 2 + 1;
-        ctx.arc(x1, y1, size1, 0, Math.PI * 2);
-        let x2 = (Math.random() * 4 - 2);
+        ctx.fillRect(x1, y1, len, 2);
+        let x2 = (Math.random() * 4 - 2) - len/2;
         let y2 = -15 + (Math.random() * 4 - 2);
         let size2 = Math.random() * 2 + 1;
-        ctx.arc(x2, y2, size2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.fillStyle = '#0002';
-        ctx.arc(x1, y1, size1-1, 0, Math.PI * 2);
-        ctx.arc(x2, y2, size2-1, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.fillRect(x2, y2, len, 2);
         ctx.restore();
     }
 }
