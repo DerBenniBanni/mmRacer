@@ -1,4 +1,5 @@
 import { HugeBackground } from "./lib/hugebackground.js";
+import {TrackRenderer} from "./tracks/trackrenderer.js";
 
 export class Game {
     constructor() {
@@ -22,7 +23,7 @@ export class Game {
             brake: false
         }
 
-        this.hugeBackground = new HugeBackground(8000, 8000, 2000, 500);
+        this.hugeBackground = new HugeBackground(8000, 8000, 0, 0);
         
 
         this.registerKeyboardListeners();
@@ -54,18 +55,20 @@ export class Game {
         });
     }
 
-    generateBackground() {
+    generateBackground(track) {
         let ctx = this.hugeBackground.getCtx();
         ctx.fillStyle = '#333333';
         ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
 
+        let trackrenderer = new TrackRenderer(track);
+        trackrenderer.render(ctx);
 
         // Add some random details to the background
         for (let i = 0; i < 100000; i++) {
             let x = Math.random() * this.hugeBackground.width;
             let y = Math.random() * this.hugeBackground.height;
-            let size = Math.random() * 5 + 25;
-            ctx.fillStyle = '#444444' + Math.floor(0 + Math.random() * 30).toString(16);
+            let size = Math.random() * 25 + 10;
+            ctx.fillStyle = '#444444' + Math.floor(Math.random() * 20).toString(16);
             ctx.beginPath();
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();
@@ -85,7 +88,8 @@ export class Game {
     updateBackground() {
         this.hugeBackground.getCtx().save();
         this.hugeBackground.getCtx().translate(this.hugeBackground.offsetX, this.hugeBackground.offsetY);
-        this.gameobjects.find(obj => obj.updateBackground)?.updateBackground(this.hugeBackground.getCtx());
+        this.gameobjects.filter(obj => obj.updateBackground)
+            .forEach(obj => obj.updateBackground(this.hugeBackground.getCtx()));
         this.hugeBackground.getCtx().restore();
     }
 

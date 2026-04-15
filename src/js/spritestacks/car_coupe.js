@@ -1,6 +1,6 @@
 import {addBlocks, addBox, BOX} from "./stackdef.js";
 
-const stackDefCarMini = {
+const stackDefCarCoupe = {
     width:60,
     height:30,
     layers: []
@@ -8,13 +8,14 @@ const stackDefCarMini = {
 
 
 
-const col = 'f00';
-const coldark = 'a00';
+const col = 'b60';
+const coldark = '830';
 const glass = '07a';
 const tire = '000';
 const bumper = '222';
 const rim = '444';
 const light = 'ffc';
+const breakslight = 'f00';
 const shadow = '00000011';
 
 let blocks = [];
@@ -65,9 +66,9 @@ blocks.push([BOX, 3, 4, 46, 0, 6, 30, rim]);
 
 // upper chassis
 for(let i=0; i <=3; i++) {
-    let x = i+2;
+    let x = 10+i+2;
     let y = 2+i/2;
-    let w = 40-3*i;
+    let w = 30-3*i;
     let h = 26-i;
     // glass
     blocks.push([BOX, 14+i, 1, x, y, w, h, glass]);
@@ -78,18 +79,18 @@ for(let i=0; i <=3; i++) {
     blocks.push([BOX, 14+i, 1, x+w-2, y, 2, 2, col]);
     blocks.push([BOX, 14+i, 1, x+w-2, y+h-2, 2, 2, col]);
     // beams middle
-    blocks.push([BOX, 14+i, 1, 10, y, 2, 2, col]);
-    blocks.push([BOX, 14+i, 1, 10, y+h-2, 2, 2, col]);
     blocks.push([BOX, 14+i, 1, 24, y, 2, 2, col]);
     blocks.push([BOX, 14+i, 1, 24, y+h-2, 2, 2, col]);
 }
 // roof
-blocks.push([BOX, 19, 1,5, 4, 30, 22, col]);
+blocks.push([BOX, 19, 1,15, 4, 20, 22, col]);
 // grill
 blocks.push([BOX, 10, 2,60, 2, 1, 26, rim]);
 // lights
 blocks.push([BOX, 7, 4,59, 2, 2, 5, light]);
 blocks.push([BOX, 7, 4,59, 23, 2, 5, light]);
+blocks.push([BOX, 7, 4,-1, 2, 2, 5, breakslight]);
+blocks.push([BOX, 7, 4,-1, 23, 2, 5, breakslight]);
 /*
 // lightbeams
 for(let i = 0; i < 15; i++) {
@@ -105,6 +106,6 @@ for(let i = 0; i < 15; i++) {
 }
 */
 
-addBlocks(stackDefCarMini, blocks);
-export default stackDefCarMini;
-export {stackDefCarMini};
+addBlocks(stackDefCarCoupe, blocks);
+export default stackDefCarCoupe;
+export {stackDefCarCoupe};

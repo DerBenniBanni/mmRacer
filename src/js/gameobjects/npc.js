@@ -1,13 +1,19 @@
 import {Car} from "./car.js";
-import stackDefCarCoupe from "../spritestacks/car_coupe.js";
+import stackDefCarMini from "../spritestacks/car_mini.js";
 
-export class Player extends Car {
+export class Npc extends Car {
     constructor({x,y,rot=0}) {
-        super({x,y,rot, stackdef: stackDefCarCoupe, maxspeed:600});
+        super({x,y,rot, stackdef: stackDefCarMini, maxspeed:600});
         this.type = 'Player';
 
         this.vx = 0;
         this.vy = 0;
+
+        this.follow = null;
+    }
+
+    follow(obj) {
+        this.follow = obj;
     }
 
     update(deltaTime) {
