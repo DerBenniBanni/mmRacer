@@ -10,7 +10,22 @@ export class TrackRenderer {
         if(points.length < 2) {
             return;
         }
-        [{c:'#aaaa99',w:420},{c:'#222222',w:400}].forEach(linedef => {
+
+        let patternCanvas = new OffscreenCanvas(200,200);
+        let patternCtx = patternCanvas.getContext("2d");
+        for(let i = 0; i < 6000; i++) {
+            let x = Math.random()*patternCanvas.width;
+            let y = Math.random()*patternCanvas.height;
+            patternCtx.fillStyle = "#ffffff" + Math.round(Math.random()*100 + 50).toString(16);
+            patternCtx.save();
+            patternCtx.translate(x,y);
+            patternCtx.rotate(Math.random());
+            patternCtx.fillRect(0,0,3,1);
+            patternCtx.restore();
+        }
+        let pattern = ctx.createPattern(patternCanvas, 'repeat')
+        ctx.save();
+        [{c:pattern,w:440, bulbs:true},{c:'#222222',w:400}].forEach(linedef => {
             ctx.lineWidth = linedef.w;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -24,7 +39,17 @@ export class TrackRenderer {
             ctx.lineTo(points[0].x, points[0].y);
             ctx.stroke();
             ctx.closePath();
+
+            if(linedef.bulbs) {
+                points.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 10, 0, 2*Math.PI);
+                    ctx.stroke();
+                    ctx.closePath();
+                });
+            }
         });
+        ctx.restore();
 
     }
 }

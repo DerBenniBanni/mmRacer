@@ -9,7 +9,7 @@ const stackDefCarCoupe = {
 
 
 const col = 'b60';
-const coldark = '830';
+const coldark = '950';
 const glass = '07a';
 const tire = '000';
 const bumper = '222';
@@ -65,6 +65,7 @@ blocks.push([BOX, 2, 6, 47, 0, 4, 30, rim]);
 blocks.push([BOX, 3, 4, 46, 0, 6, 30, rim]);
 
 // upper chassis
+blocks.push([BOX, 14, 1, 11, 1, 33, 28, coldark]);
 for(let i=0; i <=3; i++) {
     let x = 10+i+2;
     let y = 2+i/2;
@@ -73,17 +74,18 @@ for(let i=0; i <=3; i++) {
     // glass
     blocks.push([BOX, 14+i, 1, x, y, w, h, glass]);
     // beams back
-    blocks.push([BOX, 14+i, 1, x, y, 2, 2, col]);
-    blocks.push([BOX, 14+i, 1, x, y+h-2, 2, 2, col]);
+    blocks.push([BOX, 14+i, 1, x, y, 2, 2, coldark]);
+    blocks.push([BOX, 14+i, 1, x, y+h-2, 2, 2, coldark]);
     // beams front
-    blocks.push([BOX, 14+i, 1, x+w-2, y, 2, 2, col]);
-    blocks.push([BOX, 14+i, 1, x+w-2, y+h-2, 2, 2, col]);
+    blocks.push([BOX, 14+i, 1, x+w-2, y, 2, 2, coldark]);
+    blocks.push([BOX, 14+i, 1, x+w-2, y+h-2, 2, 2, coldark]);
     // beams middle
-    blocks.push([BOX, 14+i, 1, 24, y, 2, 2, col]);
-    blocks.push([BOX, 14+i, 1, 24, y+h-2, 2, 2, col]);
+    blocks.push([BOX, 14+i, 1, 24, y, 2, 2, coldark]);
+    blocks.push([BOX, 14+i, 1, 24, y+h-2, 2, 2, coldark]);
 }
 // roof
-blocks.push([BOX, 19, 1,15, 4, 20, 22, col]);
+blocks.push([BOX, 19, 1, 15, 4, 20, 22, coldark]);
+blocks.push([BOX, 19, 1, 16, 5, 18, 20, col]);
 // grill
 blocks.push([BOX, 10, 2,60, 2, 1, 26, rim]);
 // lights

@@ -1,9 +1,22 @@
 import {Car} from "./car.js";
 import stackDefCarMini from "../spritestacks/car_mini.js";
+import stackDefCarCoupe from "../spritestacks/car_coupe.js";
+import stackDefCarCabrio from "../spritestacks/car_cabrio.js";
+
+export const MINI = 0;
+export const COUPE = 1;
+export const CABRIO = 2;
+
+const stackdefs = [
+    stackDefCarMini,
+    stackDefCarCoupe,
+    stackDefCarCabrio
+];
+
 
 export class Npc extends Car {
-    constructor({x,y,rot=0}) {
-        super({x,y,rot, stackdef: stackDefCarMini, maxspeed:600});
+    constructor({x, y, rot=0, cartype=MINI}) {
+        super({x,y,rot, stackdef: stackdefs[cartype], maxspeed:600});
         this.type = 'Player';
 
         this.vx = 0;
