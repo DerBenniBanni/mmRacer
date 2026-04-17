@@ -5,11 +5,13 @@ import {CABRIO, COUPE, MINI, Npc} from "./js/gameobjects/npc.js";
 
 document.addEventListener('DOMContentLoaded', () => {
     const game = new Game();
-    game.generateBackground(desktrack);
+    game.setTrack(desktrack);
     let x = desktrack.points[0][0];
     let y = desktrack.points[0][1];
-    let player = game.addGameObject(new Player({x, y, cartype:CABRIO}));
-    let cabrio = game.addGameObject(new Npc({x:x-100, y:y+20, cartype:COUPE}));
-    let mini = game.addGameObject(new Npc({x:x+100, y:y-30, cartype:MINI}));
-    game.setCameraTarget(player);
+    //let player = game.addGameObject(new Player({x, y, cartype:CABRIO}));
+    //let cabrio = game.addGameObject(new Npc({x:x-100, y:y+20, cartype:COUPE}));
+    //let mini = game.addGameObject(new Npc({x:x+100, y:y-30, cartype:MINI}));
+    //game.setCameraTarget(player);
+    game.setPlayer1(new Player({x, y, cartype:CABRIO}));
+    game.setPlayer2(new Npc({x:x-100, y:y+20, cartype:MINI}));
 });

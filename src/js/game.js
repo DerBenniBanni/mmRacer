@@ -1,3 +1,5 @@
+import DynamicSplitRenderer from "./lib/dynamicsplit.js";
+import { Vec2d } from "./lib/geometric.js";
 import { HugeBackground } from "./lib/hugebackground.js";
 import {TrackRenderer} from "./tracks/trackrenderer.js";
 
@@ -8,7 +10,19 @@ export class Game {
 
         this.gameobjects = [];
 
-        this.camera = { 
+        this.player1 = null;
+        this.player2 = null;
+        this.splitRenderer = new DynamicSplitRenderer(this.canvas);
+        this.splitEnabled = false;
+
+        this.camera1 = { 
+            x: this.canvas.width / 2, 
+            y: this.canvas.height / 2,
+            target:null,
+            offsetX:0,
+            offsetY:0 //this.canvas.height / 4
+        };
+        this.camera2 = { 
             x: this.canvas.width / 2, 
             y: this.canvas.height / 2,
             target:null,
@@ -22,6 +36,8 @@ export class Game {
             accelerate: false,
             brake: false
         }
+
+        this.track = null;
 
         this.hugeBackground = new HugeBackground(8000, 8000, 0, 0);
         
@@ -55,14 +71,19 @@ export class Game {
         });
     }
 
-    generateBackground(track) {
+    setTrack(track) {
+        this.track = track;
+        this.generateBackground();
+    }
+    generateBackground() {
         let ctx = this.hugeBackground.getCtx();
         ctx.fillStyle = '#333333';
         ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
 
-        let trackrenderer = new TrackRenderer(track);
-        trackrenderer.render(ctx);
-
+        if(!!this.track) {
+            let trackrenderer = new TrackRenderer(this.track);
+            trackrenderer.render(ctx);
+        }
         // Add some random details to the background
         for (let i = 0; i < 100000; i++) {
             let x = Math.random() * this.hugeBackground.width;
@@ -74,6 +95,19 @@ export class Game {
             ctx.fill();
         }
     }
+    setPlayer1(player) {
+        this.player1 = player;
+        this.addGameObject(player);
+        this.camera1.target = player;
+        this.splitEnabled = !!this.player2;
+    }
+    setPlayer2(player) {
+        this.player2 = player;
+        this.addGameObject(player);
+        this.camera2.target = player;
+        this.splitEnabled = !!this.player1;
+    }
+
 
     gameLoop(currentTime) {
         let deltaTime = (currentTime - this.lastUpdateTime) / 1000; // in seconds
@@ -100,25 +134,99 @@ export class Game {
             }
         }
         this.gameobjects = this.gameobjects.filter(obj => obj.ttl > 0);
-        if(this.camera.target) {
-            this.camera.x = this.camera.target.x + this.camera.offsetX;
-            this.camera.y = this.camera.target.y + this.camera.offsetY;
-        }
+        [this.camera1, this.camera2].forEach(camera => {
+            if(!!camera && camera.target) {
+                camera.x = camera.target.x + camera.offsetX;
+                camera.y = camera.target.y + camera.offsetY;
+            }
+        });
     }
 
     render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        this.hugeBackground.render(this.ctx, this.camera.x, this.camera.y, this.canvas.width, this.canvas.height);
-        this.ctx.save();
-        this.ctx.translate(this.canvas.width / 2 - this.camera.x, this.canvas.height / 2 - this.camera.y);
         this.gameobjects.sort((a, b) => a.y - b.y); // sort by y position
+        if(!this.splitEnabled) {
+            // only render player 1 view if player 2 is not set
+            this.renderCameraView(this.ctx, this.camera1);
+            return;
+        }
+        this.renderSplitView(this.ctx);
+    }
+
+    renderCameraView(ctx, camera) {
+        this.hugeBackground.render(ctx, camera.x, camera.y, this.canvas.width, this.canvas.height);
+        ctx.save();
+        ctx.translate(this.canvas.width / 2 - camera.x, this.canvas.height / 2 - camera.y);
         for (let obj of this.gameobjects) {
             if (obj.render) {
-                obj.render(this.ctx);
+                obj.render(ctx);
             }
         }
-        this.ctx.restore();
+        ctx.restore();
+    }
+
+    renderSplitView(ctx) {
+        let angleBetweenPlayers = Math.atan2(this.player2.y - this.player1.y, this.player2.x - this.player1.x);
+        let distanceBetweenPlayers = new Vec2d(this.player1.x, this.player1.y).distance(new Vec2d(this.player2.x, this.player2.y));
+        let centerPoint = new Vec2d((this.player1.x + this.player2.x)/2,(this.player1.y + this.player2.y)/2);
+        let center = new Vec2d(ctx.canvas.width / 2, ctx.canvas.height / 2);
+        let player1ScreenPos = center.add(Vec2d.fromPolarElipse(angleBetweenPlayers - Math.PI,ctx.canvas.width / 4, ctx.canvas.height / 4));
+        let player2ScreenPos = center.add(Vec2d.fromPolarElipse(angleBetweenPlayers, ctx.canvas.width / 4, ctx.canvas.height / 4));
+        let distanceBetweenScreenPositions = player1ScreenPos.distance(player2ScreenPos);
         
+        this.splitRenderer.setAngle(angleBetweenPlayers+Math.PI/2);
+        let renderObjects = this.gameobjects.filter(obj => obj.render);
+        let hugeBackground = this.hugeBackground;
+        let camera1 = this.camera1;
+        let camera2 = this.camera2;
+        let canvasWidth = this.canvas.width;
+        let canvasHeight = this.canvas.height;
+        let game = this;
+        if(distanceBetweenScreenPositions < distanceBetweenPlayers) {
+            let distanceFactor = (distanceBetweenPlayers - distanceBetweenScreenPositions) / 200;
+            distanceFactor = distanceFactor < 0 ? 0 : distanceFactor;
+            distanceFactor =distanceFactor > 4 ? 4 : distanceFactor;
+            this.splitRenderer.render(ctx, distanceFactor,
+                (ctx) => {
+                    // Render the player 1 side
+                    hugeBackground.render(ctx, 
+                        game.player1.x-player1ScreenPos.x + canvasWidth/2, 
+                        game.player1.y-player1ScreenPos.y + canvasHeight/2, 
+                        canvasWidth, canvasHeight);
+                    ctx.save();
+                    ctx.translate(player1ScreenPos.x - game.player1.x, player1ScreenPos.y - game.player1.y);
+                    renderObjects.forEach((gameObject) => {
+                        gameObject.render(ctx);
+                    });
+                    ctx.restore();
+                },
+                (ctx) => {
+                    // Render the player 2 side
+                    
+                    hugeBackground.render(ctx, 
+                        game.player2.x-player2ScreenPos.x + canvasWidth/2, 
+                        game.player2.y-player2ScreenPos.y + canvasHeight/2, 
+                        canvasWidth, canvasHeight);
+                    ctx.save();
+                    ctx.translate(player2ScreenPos.x - game.player2.x, player2ScreenPos.y - game.player2.y);
+                    renderObjects.forEach((gameObject) => {
+                        gameObject.render(ctx);
+                    });
+                    ctx.restore();
+                }
+            );
+        } else {
+            hugeBackground.render(ctx, 
+                        centerPoint.x + canvasWidth/2 - center.x, 
+                        centerPoint.y + canvasHeight/2 - center.y, 
+                        canvasWidth, canvasHeight);
+            ctx.save();
+            ctx.translate(-centerPoint.x + ctx.canvas.width/2, -centerPoint.y + ctx.canvas.height/2);
+            renderObjects.forEach((gameObject) => {
+                gameObject.render(ctx);
+            });
+            ctx.restore();
+        }
     }
 
     addGameObject(gameObject) {

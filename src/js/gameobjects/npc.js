@@ -2,6 +2,8 @@ import {Car} from "./car.js";
 import stackDefCarMini from "../spritestacks/car_mini.js";
 import stackDefCarCoupe from "../spritestacks/car_coupe.js";
 import stackDefCarCabrio from "../spritestacks/car_cabrio.js";
+import { Circle } from "../lib/geometric.js";
+import { checkCirclesCollision } from "../lib/collisions.js";
 
 export const MINI = 0;
 export const COUPE = 1;
@@ -16,22 +18,58 @@ const stackdefs = [
 
 export class Npc extends Car {
     constructor({x, y, rot=0, cartype=MINI}) {
-        super({x,y,rot, stackdef: stackdefs[cartype], maxspeed:600});
+        super({x,y,rot, stackdef: stackdefs[cartype], maxspeed:500});
         this.type = 'Player';
 
         this.vx = 0;
         this.vy = 0;
+        
+        this.vr = 0;
+        this.vrMax = 3;
+        this.vrRate = 20;
 
-        this.follow = null;
-    }
-
-    follow(obj) {
-        this.follow = obj;
+        this.target = null;
     }
 
     update(deltaTime) {
         super.update(deltaTime);
-        // handle input for rotation and acceleration
+        this.updateTarget();
+
+        let targetVec2 = {
+            x: this.target.point[0] - this.x,
+            y: this.target.point[1] - this.y
+        };
+        let targetAngle = Math.atan2(targetVec2.y, targetVec2.x);
+        let angleDiff = targetAngle - this.rot;
+        if(angleDiff > Math.PI) {
+            angleDiff -= 2 * Math.PI;
+        }
+        if(angleDiff < -Math.PI) {
+            angleDiff += 2 * Math.PI;
+        }
+        if(angleDiff > 0.1) {
+            this.vr += this.vrRate * deltaTime;
+        } else if(angleDiff < -0.1) {
+            this.vr -= this.vrRate * deltaTime;
+        } else {
+            this.vr = 0;
+        }
+        this.speed += 200 * deltaTime; // accelerate
+        if(this.speed > this.maxSpeed) this.speed = this.maxSpeed;
+
+        if(this.vr > this.vrMax) {
+            this.vr = this.vrMax;
+        }
+        if(this.vr < -this.vrMax) {
+            this.vr = -this.vrMax;
+        }
+        if(this.vr < 0.01 && this.vr > -0.01) {
+            this.vr = 0;
+        } else {
+            this.rot += this.vr * deltaTime;
+        }
+
+        /*
         if(this.game.inputActions.turnLeft) {
             this.rot -= Math.PI * deltaTime; // rotate left
         }
@@ -46,10 +84,38 @@ export class Npc extends Car {
             this.speed -= 300 * deltaTime; // brake
             if(this.speed < 0) this.speed = 0;
         }
+        */
         this.vx = Math.cos(this.rot) * this.speed;
         this.vy = Math.sin(this.rot) * this.speed;
         this.x += this.vx * deltaTime;
         this.y += this.vy * deltaTime;
+    }
+
+    getFuzzyTargetPoint(idx, fuzzyness=40) {
+        const point = this.game.track.points[idx];
+        return [
+            point[0] + Math.random() * fuzzyness - fuzzyness / 2,
+            point[1] + Math.random() * fuzzyness - fuzzyness / 2
+        ];
+    }
+
+    updateTarget() {
+        if(!this.game.track) {
+            return;
+        }
+        if(!this.target) {
+            this.target = {
+                idx:0,
+                point:this.getFuzzyTargetPoint(0)
+            };
+        }
+        let targetCircle = new Circle(this.target.point[0], this.target.point[1], 200);
+        let carCircle = new Circle(this.x, this.y, 50);
+        if(checkCirclesCollision(targetCircle, carCircle)) {
+            this.target.idx = (this.target.idx + 1) % this.game.track.points.length;
+            this.target.point = this.getFuzzyTargetPoint(this.target.idx);
+        }
+
     }
 
     updateBackground(ctx) {
@@ -71,5 +137,19 @@ export class Npc extends Car {
         let size2 = Math.random() * 2 + 1;
         ctx.fillRect(x2, y2, len, 2);
         ctx.restore();
+    }
+
+    render(ctx) {
+        if(!!this.target) {
+            /*
+            ctx.beginPath();
+            ctx.strokeStyle = "#ff0";
+            ctx.lineWidth = 1;
+            ctx.moveTo(this.x, this.y);
+            ctx.lineTo(this.target.point[0], this.target.point[1]);
+            ctx.stroke();
+            */
+        }
+        super.render(ctx);
     }
 }

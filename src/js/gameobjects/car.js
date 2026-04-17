@@ -19,6 +19,5 @@ export class Car extends GameObject{
 
     render(ctx) {
         this.renderer.render(ctx, this.x, this.y, this.rot);
-        return;
     }
 }
