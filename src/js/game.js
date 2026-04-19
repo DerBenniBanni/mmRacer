@@ -1,14 +1,20 @@
 import DynamicSplitRenderer from "./lib/dynamicsplit.js";
 import { Vec2d } from "./lib/geometric.js";
 import { HugeBackground } from "./lib/hugebackground.js";
+import { PositionGrid } from "./lib/positiongrid.js";
 import {TrackRenderer} from "./tracks/trackrenderer.js";
 
 export class Game {
     constructor() {
+        this.bgWidth = 8000;
+        this.bgHeight = 8000;
+        this.debug = false;
         this.canvas = document.getElementById('maincanvas');
         this.ctx = this.canvas.getContext('2d');
 
         this.gameobjects = [];
+
+        this.positionGrid = new PositionGrid(150, this.bgWidth, this.bgHeight);
 
         this.player1 = null;
         this.player2 = null;
@@ -38,8 +44,9 @@ export class Game {
         }
 
         this.track = null;
+        this.trackBounds = [];
 
-        this.hugeBackground = new HugeBackground(8000, 8000, 0, 0);
+        this.hugeBackground = new HugeBackground(this.bgWidth, this.bgHeight, 0, 0);
         
 
         this.registerKeyboardListeners();
@@ -73,15 +80,21 @@ export class Game {
 
     setTrack(track) {
         this.track = track;
-        this.generateBackground();
+        let trackrenderer = new TrackRenderer(this.track);
+        this.generateBackground(trackrenderer);
+        this.trackBounds = trackrenderer.generateTrackBounds();
+        this.positionGrid.clear();
+        this.trackBounds.forEach(boundary => {
+            this.positionGrid.addByRectangle(boundary);
+        });
     }
-    generateBackground() {
+
+    generateBackground(trackrenderer) {
         let ctx = this.hugeBackground.getCtx();
         ctx.fillStyle = '#333333';
         ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
 
         if(!!this.track) {
-            let trackrenderer = new TrackRenderer(this.track);
             trackrenderer.render(ctx);
         }
         // Add some random details to the background
@@ -95,6 +108,7 @@ export class Game {
             ctx.fill();
         }
     }
+
     setPlayer1(player) {
         this.player1 = player;
         this.addGameObject(player);
@@ -153,6 +167,13 @@ export class Game {
         this.renderSplitView(this.ctx);
     }
 
+    debugRender(ctx) {
+        if(!this.debug) return;
+        this.positionGrid.getNearby(this.player1.x, this.player1.y, 70).forEach(obj => {
+            obj.render(ctx);
+        });
+    }
+
     renderCameraView(ctx, camera) {
         this.hugeBackground.render(ctx, camera.x, camera.y, this.canvas.width, this.canvas.height);
         ctx.save();
@@ -162,6 +183,7 @@ export class Game {
                 obj.render(ctx);
             }
         }
+        this.debugRender(ctx);
         ctx.restore();
     }
 
@@ -198,6 +220,7 @@ export class Game {
                     renderObjects.forEach((gameObject) => {
                         gameObject.render(ctx);
                     });
+                    game.debugRender(ctx);
                     ctx.restore();
                 },
                 (ctx) => {
@@ -212,6 +235,7 @@ export class Game {
                     renderObjects.forEach((gameObject) => {
                         gameObject.render(ctx);
                     });
+                    game.debugRender(ctx);
                     ctx.restore();
                 }
             );
@@ -225,6 +249,7 @@ export class Game {
             renderObjects.forEach((gameObject) => {
                 gameObject.render(ctx);
             });
+            game.debugRender(ctx);
             ctx.restore();
         }
     }

@@ -2,6 +2,8 @@ import {Car} from "./car.js";
 import stackDefCarMini from "../spritestacks/car_mini.js";
 import stackDefCarCoupe from "../spritestacks/car_coupe.js";
 import stackDefCarCabrio from "../spritestacks/car_cabrio.js";
+import { checkVec2dRectangleCollision } from "../lib/collisions.js";
+import { Vec2d } from "../lib/geometric.js";
 
 export const MINI = 0;
 export const COUPE = 1;
@@ -76,8 +78,36 @@ export class Player extends Car {
         }
         this.vx = Math.cos(this.rot) * this.speed;
         this.vy = Math.sin(this.rot) * this.speed;
-        this.x += this.vx * deltaTime;
-        this.y += this.vy * deltaTime;
+        let nextX = this.x + this.vx * deltaTime;
+        let nextY = this.y + this.vy * deltaTime;
+
+
+        // check for collisions with track boundaries
+        let nearbyBoundaries = this.game.positionGrid.getNearby(nextX, nextY, 50);
+        for(let boundary of nearbyBoundaries) {
+            if(boundary.type === 'Boundary') {
+                let collision = checkVec2dRectangleCollision(new Vec2d(nextX, nextY), boundary);
+                if(collision) {
+                    // reflect the velocity vector based on the boundary normal
+                    let velocity = new Vec2d(this.vx, this.vy);
+                    let normal = boundary.normal;
+                    let dot = velocity.dot(normal);
+                    let reflected = velocity.sub(normal.multiply(2 * dot));
+                    this.vx = reflected.x * 0.5; // reduce speed on collision
+                    this.vy = reflected.y * 0.5;
+                    this.speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    this.rot = Math.atan2(this.vy, this.vx);
+                    this.skidmarks = 20;    
+                    // move the player out of the boundary to prevent sticking base on the boundary normal
+                    nextX = nextX + Math.cos(boundary.normalAngle) * 5;
+                    nextY = nextY + Math.sin(boundary.normalAngle) * 5;
+                }
+                break;
+            }
+        }
+        this.x = nextX;
+        this.y = nextY;
+
     }
 
     updateBackground(ctx) {
