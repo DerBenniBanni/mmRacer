@@ -83,12 +83,12 @@ export default class DynamicSplitRenderer {
         
         this.drawFlashLine(ctx, 30, 7, [
             [4*distanceFactor + 8, "rgba(234, 235, 170, 0.29)"],
-            [4*distanceFactor, "rgb(255, 255, 255)"],
+            [4*distanceFactor, "rgba(255, 251, 0, 0.66)"],
         ]);
         
         this.drawFlashLine(ctx, 80, 30, [
-            [3*distanceFactor, "rgba(255, 230, 0, 0.17)"],
-            [1*distanceFactor, "rgb(255, 255, 255)"],
+            [3*distanceFactor, "rgba(0, 251, 255, 0.42)"],
+            [1*distanceFactor, "rgba(183, 233, 255, 0.72)"],
         ]);
 
         ctx.restore();

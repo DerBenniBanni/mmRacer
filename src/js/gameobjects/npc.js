@@ -4,15 +4,18 @@ import stackDefCarCoupe from "../spritestacks/car_coupe.js";
 import stackDefCarCabrio from "../spritestacks/car_cabrio.js";
 import { Circle } from "../lib/geometric.js";
 import { checkCirclesCollision } from "../lib/collisions.js";
+import stackDefBotA from "../spritestacks/car_bot_a.js";
 
 export const MINI = 0;
 export const COUPE = 1;
 export const CABRIO = 2;
+export const BOT_A = 3;
 
 const stackdefs = [
     stackDefCarMini,
     stackDefCarCoupe,
-    stackDefCarCabrio
+    stackDefCarCabrio,
+    stackDefBotA
 ];
 
 
@@ -26,7 +29,7 @@ export class Npc extends Car {
         
         this.vr = 0;
         this.vrMax = 3;
-        this.vrRate = 20;
+        this.vrRate = 8;
 
         this.target = null;
     }
@@ -34,6 +37,8 @@ export class Npc extends Car {
     update(deltaTime) {
         super.update(deltaTime);
         this.updateTarget();
+        //this.rot += deltaTime;
+        //return;
 
         let targetVec2 = {
             x: this.target.point[0] - this.x,
@@ -68,6 +73,11 @@ export class Npc extends Car {
         } else {
             this.rot += this.vr * deltaTime;
         }
+        if(this.rot > Math.PI) {
+            this.rot -= 2 * Math.PI;
+        } else if(this.rot < -Math.PI) {
+            this.rot += 2 * Math.PI;
+        }
 
         /*
         if(this.game.inputActions.turnLeft) {
@@ -91,7 +101,7 @@ export class Npc extends Car {
         this.y += this.vy * deltaTime;
     }
 
-    getFuzzyTargetPoint(idx, fuzzyness=40) {
+    getFuzzyTargetPoint(idx, fuzzyness=60) {
         const point = this.game.track.points[idx];
         return [
             point[0] + Math.random() * fuzzyness - fuzzyness / 2,

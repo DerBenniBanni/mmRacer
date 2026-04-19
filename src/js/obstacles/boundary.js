@@ -6,13 +6,14 @@ export class Boundary extends Rectangle {
         this.type = 'Boundary';
         this.normalAngle = normalAngle;
         this.normal = new Vec2d(Math.cos(normalAngle), Math.sin(normalAngle));
+        this.dbgColor = '#ffff0066';
     }
 
     // for debugging only...
     render(ctx) {
         ctx.save();
         ctx.translate(this.x, this.y);
-        ctx.strokeStyle = '#ffff0066';
+        ctx.strokeStyle = this.dbgColor;
         ctx.lineWidth = 8;
         ctx.save();
         ctx.rotate(this.rotation);

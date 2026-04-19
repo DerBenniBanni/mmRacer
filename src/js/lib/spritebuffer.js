@@ -14,13 +14,12 @@ export class SpriteBuffer {
         }
     }
 
-    getCanvas(instanceIndex = 0) {
+    get(instanceIndex = 0) {
         return this.canvases.get(instanceIndex).canvas;
     }
 
     getCtx(instanceIndex = 0) {
-        const canvas = this.getCanvas(instanceIndex);
-        return canvas.getContext('2d');
+        return this.get(instanceIndex).getContext('2d');
     }
     
     setFinished(instanceIndex = 0) {

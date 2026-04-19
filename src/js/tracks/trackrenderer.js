@@ -3,7 +3,7 @@ import { Boundary } from "../obstacles/boundary.js";
 export class TrackRenderer {
     constructor(trackdef,) {
         this.trackdef = trackdef;
-        this.trackwidth = 400;
+        this.trackwidth = 300;
     }
 
     render(ctx) {
@@ -136,7 +136,6 @@ export class TrackRenderer {
             boundaries.push(leftBoundary);
             boundaries.push(rightBoundary);
         }
-
 
         return boundaries;  
 

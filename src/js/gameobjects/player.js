@@ -63,6 +63,13 @@ export class Player extends Car {
                 this.rot += this.vr * deltaTime;
             }
         }
+        
+        if(this.rot > Math.PI) {
+            this.rot -= 2 * Math.PI;
+        } else if(this.rot < -Math.PI) {
+            this.rot += 2 * Math.PI;
+        }
+        
         if(this.game.inputActions.accelerate) {
             this.speed += 200 * deltaTime; // accelerate
             if(this.speed > this.maxSpeed) {
@@ -96,13 +103,23 @@ export class Player extends Car {
                     this.vx = reflected.x * 0.5; // reduce speed on collision
                     this.vy = reflected.y * 0.5;
                     this.speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
-                    this.rot = Math.atan2(this.vy, this.vx);
+                    // update the rotation based on the new velocity vector, rotate only abit towards the new velocity direction to avoid sudden flips
+                    let newRot = Math.atan2(this.vy, this.vx);
+                    let rotDiff = newRot - this.rot;
+                    if(rotDiff > Math.PI) {
+                        rotDiff -= 2 * Math.PI;
+                    }
+                    if(rotDiff < -Math.PI) {
+                        rotDiff += 2 * Math.PI;
+                    }
+                    this.rot += rotDiff * 0.6; // 0.5 would rotate the car alongside the boundary
+
                     this.skidmarks = 20;    
                     // move the player out of the boundary to prevent sticking base on the boundary normal
                     nextX = nextX + Math.cos(boundary.normalAngle) * 5;
                     nextY = nextY + Math.sin(boundary.normalAngle) * 5;
+                    break;
                 }
-                break;
             }
         }
         this.x = nextX;
@@ -110,6 +127,7 @@ export class Player extends Car {
 
     }
 
+        
     updateBackground(ctx) {
         if(this.speed < this.maxSpeed /10) {
             return;
