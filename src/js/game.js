@@ -91,13 +91,15 @@ export class Game {
 
     generateBackground(trackrenderer) {
         let ctx = this.hugeBackground.getCtx();
-        ctx.fillStyle = '#333333';
-        ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
+        this.createWoodTexture(ctx, this.hugeBackground.width, this.hugeBackground.height);
+        //ctx.fillStyle = '#333333';
+        //ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
 
         if(!!this.track) {
             trackrenderer.render(ctx);
         }
         // Add some random details to the background
+        /*
         for (let i = 0; i < 100000; i++) {
             let x = Math.random() * this.hugeBackground.width;
             let y = Math.random() * this.hugeBackground.height;
@@ -107,6 +109,42 @@ export class Game {
             ctx.arc(x, y, size, 0, Math.PI * 2);
             ctx.fill();
         }
+        */
+    }
+
+    createWoodTexture(ctx, width, height) {
+        const imageData = ctx.createImageData(width, height);
+        const data = imageData.data;
+
+        const color1 = [139, 69, 19]; // Dark Brown
+        const color2 = [160, 90, 25]; // Light Brown
+
+        for (let y = 0; y < height; y++) {
+            for (let x = 0; x < width; x++) {
+                // Generate procedural noise based on sine/cosine waves and random math
+                // Stretching the noise to create a "grain"
+                let grain = 
+                    Math.sin((x+y) * 0.15 + Math.sin(y * 0.01) * 2) * 0.5 
+                    + Math.sin((x+y) * 0.1 + Math.sin(y * 0.05) * 2) * 0.5
+                    + Math.cos((x+y) * 1.1 + Math.cos(y * 0.05) * 2) * 0.5;
+                let noise = Math.random() * 3.5; // Add some random variation
+                
+                let mix = grain + noise;
+                mix = Math.max(0, Math.min(1, mix)); // Clamp between 0 and 1
+
+                // Linearly interpolate between the two wood colors
+                const r = color1[0] * mix + color2[0] * (1 - mix);
+                const g = color1[1] * mix + color2[1] * (1 - mix);
+                const b = color1[2] * mix + color2[2] * (1 - mix);
+
+                const index = (y * width + x) * 4;
+                data[index] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
+                data[index + 3] = 255; // Alpha
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
     }
 
     setPlayer1(player) {

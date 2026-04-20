@@ -6,6 +6,7 @@ export class TrackRenderer {
         this.trackwidth = 300;
     }
 
+
     render(ctx) {
         let points = this.trackdef.points.map(p => {
             return {x:p[0], y:p[1]};
@@ -26,9 +27,22 @@ export class TrackRenderer {
             patternCtx.fillRect(0,0,3,1);
             patternCtx.restore();
         }
-        let pattern = ctx.createPattern(patternCanvas, 'repeat')
+        let chalkPattern = ctx.createPattern(patternCanvas, 'repeat');
+        patternCtx.fillStyle='#553322';
+        patternCtx.fillRect(0,0,200,200);
+        for(let i = 0; i < 6000; i++) {
+            let x = Math.random()*patternCanvas.width;
+            let y = Math.random()*patternCanvas.height;
+            patternCtx.fillStyle = "#725324" + Math.round(Math.random()*50 + 10).toString(16);
+            patternCtx.save();
+            patternCtx.translate(x,y);
+            patternCtx.rotate(Math.random());
+            patternCtx.fillRect(0,0,3,1);
+            patternCtx.restore();
+        }
+        let trackPattern = ctx.createPattern(patternCanvas, 'repeat');
         ctx.save();
-        [{c:pattern,w:this.trackwidth+40, bulbs:true},{c:'#222222',w:this.trackwidth}].forEach(linedef => {
+        [{c:chalkPattern,w:this.trackwidth+40, bulbs:true},{c:trackPattern,w:this.trackwidth}].forEach(linedef => {
             ctx.lineWidth = linedef.w;
             ctx.lineCap = 'round';
             ctx.lineJoin = 'round';
@@ -59,7 +73,7 @@ export class TrackRenderer {
         ctx.translate(points[0].x, points[0].y);
         ctx.rotate(angle);
         ctx.lineWidth = 30;
-        ctx.strokeStyle = pattern;
+        ctx.strokeStyle = chalkPattern;
         ctx.beginPath();
         ctx.moveTo(-0,-250);
         ctx.lineTo(0, 250);
