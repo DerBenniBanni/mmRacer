@@ -6,6 +6,7 @@ import { checkVec2dRectangleCollision } from "../lib/collisions.js";
 import { Vec2d } from "../lib/geometric.js";
 import stackDefBotA from "../spritestacks/car_bot_a.js";
 import stackDefBotLightcycle from "../spritestacks/car_bot_lightcycle.js";
+import { STATE_MENU } from "../game.js";
 
 export const MINI = 0;
 export const COUPE = 1;
@@ -21,6 +22,8 @@ const stackdefs = [
     stackDefBotLightcycle
 ];
 
+const playerCars = [MINI, COUPE, CABRIO];
+
 export class Player extends Car {
     constructor({x,y,rot=0, cartype=MINI}) {
         super({x,y,rot, stackdef: stackdefs[cartype], maxspeed:600});
@@ -33,10 +36,25 @@ export class Player extends Car {
         this.vrRate = 10;
 
         this.skidmarks = 0;
+        this.cartype = cartype;
     }
 
     update(deltaTime) {
         super.update(deltaTime);
+        if(this.game.state == STATE_MENU) {
+            this.rot += 0.5 * deltaTime;
+            if(this.game.inputActions.turnLeft) {
+                this.cartype = (this.cartype - 1 + playerCars.length) % playerCars.length;
+                this.setSpriteStackDef(stackdefs[this.cartype]);
+                this.game.inputActions.turnLeft = false; // prevent continuous switching
+            }
+            if(this.game.inputActions.turnRight) {
+                this.cartype = (this.cartype + 1) % playerCars.length;
+                this.setSpriteStackDef(stackdefs[this.cartype]);
+                this.game.inputActions.turnRight = false; // prevent continuous switching
+            }
+            return;
+        }
         this.skidmarks = 0;
         // handle input for rotation and acceleration
         let turningPressed = false;

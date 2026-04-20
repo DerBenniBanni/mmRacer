@@ -17,6 +17,11 @@ export class Car extends GameObject{
         this.renderer = new StackedSprite(stackdef);
     }
 
+    setSpriteStackDef(stackdef) {
+        this.spriteBuffer = new SpriteBuffer(this.spriteSize, this.spriteSize, 360);
+        this.renderer = new StackedSprite(stackdef);
+    }
+
     render(ctx) {
         let degree = Math.round(this.rot * 180 / Math.PI) % 360;
         if(degree < 0) {

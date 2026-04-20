@@ -4,6 +4,9 @@ import { HugeBackground } from "./lib/hugebackground.js";
 import { PositionGrid } from "./lib/positiongrid.js";
 import {TrackRenderer} from "./tracks/trackrenderer.js";
 
+export const STATE_MENU = 0;
+export const STATE_PLAYING = 1;
+
 export class Game {
     constructor() {
         this.bgWidth = 8000;
@@ -12,6 +15,7 @@ export class Game {
         this.canvas = document.getElementById('maincanvas');
         this.ctx = this.canvas.getContext('2d');
 
+        this.state = STATE_MENU;
         this.gameobjects = [];
 
         this.positionGrid = new PositionGrid(150, this.bgWidth, this.bgHeight);
@@ -64,7 +68,8 @@ export class Game {
             'ArrowUp': 'accelerate',
             'KeyW': 'accelerate',
             'ArrowDown': 'brake',
-            'KeyS': 'brake'
+            'KeyS': 'brake',
+            'Space': 'start'
         };
         window.addEventListener('keydown', (e) => {
             if(keyActions[e.code] !== undefined) {
@@ -180,6 +185,10 @@ export class Game {
     }
 
     update(deltaTime) {
+        if(this.state === STATE_MENU && this.inputActions.start) {
+            this.state = STATE_PLAYING;
+            $addClass("#info", "hidden");
+        }
         for (let obj of this.gameobjects) {
             if (obj.update) {
                 obj.update(deltaTime);

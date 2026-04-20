@@ -9,5 +9,29 @@
 </head>
 <body>
     <canvas id="maincanvas" width="1920" height="1080"></canvas>
+    <div id="ui" class="abs hidden">
+        <div id="player1" class="player">
+            <h2>Player 1</h2>
+            <p>Laps: <span id="lap1">0</span></p>
+        </div>
+        <div id="player2" class="player">
+            <h2>Player 2</h2>
+            <p>Laps: <span id="lap2">0</span></p>
+        </div>
+    </div>
+    <div id="title" class="abs">
+        <div class="center">
+            <div class="sub">DerBenniBanni presents</div>
+            <div id="mm" class="metal">m13Kro&nbsp;Machines</div>
+            <div class="sub">for gamedev.js 2026</div>
+            <div id="prerender" class="sub tm100">please stand by... prerendering</div>
+            <div id="start" class="sub tm100 hidden">click to start</div>
+        </div>
+    </div>
+    <div id="info" class="abs hidden">
+        <div class="center">
+            <div class="sub" id="select">left/right to select car, space to start</div>
+        </div>
+    </div>
 </body>
 </html>
