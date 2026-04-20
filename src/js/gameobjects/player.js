@@ -4,15 +4,21 @@ import stackDefCarCoupe from "../spritestacks/car_coupe.js";
 import stackDefCarCabrio from "../spritestacks/car_cabrio.js";
 import { checkVec2dRectangleCollision } from "../lib/collisions.js";
 import { Vec2d } from "../lib/geometric.js";
+import stackDefBotA from "../spritestacks/car_bot_a.js";
+import stackDefBotLightcycle from "../spritestacks/car_bot_lightcycle.js";
 
 export const MINI = 0;
 export const COUPE = 1;
 export const CABRIO = 2;
+export const BOT_A = 3;
+export const BOT_LIGHTCYCLE = 4;
 
 const stackdefs = [
     stackDefCarMini,
     stackDefCarCoupe,
-    stackDefCarCabrio
+    stackDefCarCabrio,
+    stackDefBotA,
+    stackDefBotLightcycle
 ];
 
 export class Player extends Car {

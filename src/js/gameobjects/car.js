@@ -1,7 +1,6 @@
 import {GameObject} from "../gameobject.js";
 import {SpriteBuffer} from "../lib/spritebuffer.js";
 import StackedSprite from "../renderer/stackedsprite.js";
-import stackDefCarMini from "../spritestacks/car_mini.js";
 
 export class Car extends GameObject{
     constructor({x, y, maxspeed, stackdef, rot=0}) {

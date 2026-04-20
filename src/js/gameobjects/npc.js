@@ -5,17 +5,20 @@ import stackDefCarCabrio from "../spritestacks/car_cabrio.js";
 import { Circle } from "../lib/geometric.js";
 import { checkCirclesCollision } from "../lib/collisions.js";
 import stackDefBotA from "../spritestacks/car_bot_a.js";
+import stackDefBotLightcycle from "../spritestacks/car_bot_lightcycle.js";
 
 export const MINI = 0;
 export const COUPE = 1;
 export const CABRIO = 2;
 export const BOT_A = 3;
+export const BOT_LIGHTCYCLE = 4;
 
 const stackdefs = [
     stackDefCarMini,
     stackDefCarCoupe,
     stackDefCarCabrio,
-    stackDefBotA
+    stackDefBotA,
+    stackDefBotLightcycle
 ];
 
 
