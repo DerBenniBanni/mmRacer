@@ -37,12 +37,13 @@ blocks.push([BOX, 13, 1, 6, 12, 48, 6, glass]);
 blocks.push([BOX, 14, 1, 6, 12, 46, 6, col]);
 blocks.push([BOX, 7, 3, 25, 2, 20, 26, coldark]);
 blocks.push([BOX, 10, 1, 26, 3, 18, 24, col]);
+/*
 for(let i=0; i<10; i++) {
    blocks.push([BOX, 13+i, 1, 12-i, 13, 18, 4, col]);
 }
 blocks.push([BOX, 23, 1, 0, 0, 18, 30, glass]);
 blocks.push([BOX, 23, 1, 0, 1, 18, 28, col]);
-
+*/
 function addTire(blocks, bottom, xCenter, yCenter, diameter, width, color) {
     // TODO: change to cylinder
     let y = yCenter - width/2;
@@ -54,13 +55,13 @@ function addTire(blocks, bottom, xCenter, yCenter, diameter, width, color) {
     }
 }
 
-addTire(blocks, 0, 10, 22, 20, 10, tire);
-addTire(blocks, 2, 10, 22, 16, 10, glass);
-addTire(blocks, 4, 10, 22, 12, 11, tire);
+addTire(blocks, 0, 10, 25, 20, 10, tire);
+addTire(blocks, 2, 10, 25, 16, 10, glass);
+addTire(blocks, 4, 10, 25, 12, 11, tire);
 
-addTire(blocks, 0, 10, 8, 20, 10, tire);
-addTire(blocks, 2, 10, 8, 16, 10, glass);
-addTire(blocks, 4, 10, 8, 12, 11, tire);
+addTire(blocks, 0, 10, 5, 20, 10, tire);
+addTire(blocks, 2, 10, 5, 16, 10, glass);
+addTire(blocks, 4, 10, 5, 12, 11, tire);
 
 
 addTire(blocks, 0, 55, 20, 12, 4, tire);

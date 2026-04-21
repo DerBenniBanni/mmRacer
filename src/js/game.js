@@ -52,6 +52,7 @@ export class Game {
 
         this.hugeBackground = new HugeBackground(this.bgWidth, this.bgHeight, 0, 0);
         
+        this.createNpcs = () => {}; // placeholder function to create NPCs after track is loaded
 
         this.registerKeyboardListeners();
 
@@ -96,12 +97,12 @@ export class Game {
 
     generateBackground(trackrenderer) {
         let ctx = this.hugeBackground.getCtx();
-        this.createWoodTexture(ctx, this.hugeBackground.width, this.hugeBackground.height);
+        //this.createWoodTexture(ctx, this.hugeBackground.width, this.hugeBackground.height);
         //ctx.fillStyle = '#333333';
         //ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
 
         if(!!this.track) {
-            trackrenderer.render(ctx);
+            //trackrenderer.render(ctx);
         }
         // Add some random details to the background
         /*
@@ -122,10 +123,10 @@ export class Game {
         const data = imageData.data;
 
         const color1 = [139, 69, 19]; // Dark Brown
-        const color2 = [160, 90, 25]; // Light Brown
+        const color2 = [200, 120, 25]; // Light Brown
 
-        for (let y = 0; y < height; y++) {
-            for (let x = 0; x < width; x++) {
+        for (let y = 0; y < height; y+=2) {
+            for (let x = 0; x < width; x+=2) {
                 // Generate procedural noise based on sine/cosine waves and random math
                 // Stretching the noise to create a "grain"
                 let grain = 
@@ -142,11 +143,18 @@ export class Game {
                 const g = color1[1] * mix + color2[1] * (1 - mix);
                 const b = color1[2] * mix + color2[2] * (1 - mix);
 
-                const index = (y * width + x) * 4;
+                let index = (y * width + x) * 4;
                 data[index] = r;
                 data[index + 1] = g;
                 data[index + 2] = b;
                 data[index + 3] = 255; // Alpha
+                if(index + width*4 < data.length) {
+                    index += width*4;
+                    data[index] = r;
+                    data[index + 1] = g;
+                    data[index + 2] = b;
+                    data[index + 3] = 255; // Alpha
+                }
             }
         }
         ctx.putImageData(imageData, 0, 0);
@@ -188,6 +196,9 @@ export class Game {
         if(this.state === STATE_MENU && this.inputActions.start) {
             this.state = STATE_PLAYING;
             $addClass("#info", "hidden");
+            this.createNpcs();
+            if(this.player1) this.player1.rot = 0;
+            if(this.player2) this.player2.rot = 0;
         }
         for (let obj of this.gameobjects) {
             if (obj.update) {

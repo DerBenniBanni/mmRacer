@@ -1,6 +1,7 @@
-import {GameObject} from "../gameobject.js";
+import {GameObject} from "../lib/gameobject.js";
 import {SpriteBuffer} from "../lib/spritebuffer.js";
 import StackedSprite from "../renderer/stackedsprite.js";
+import { Particle } from "./particle.js";
 
 export class Car extends GameObject{
     constructor({x, y, maxspeed, stackdef, rot=0}) {
@@ -15,11 +16,37 @@ export class Car extends GameObject{
         this.spriteSize = 64;
         this.spriteBuffer = new SpriteBuffer(this.spriteSize, this.spriteSize, 360);
         this.renderer = new StackedSprite(stackdef);
+        this.dustRate = 30; // particles per second at max speed
+        this.dustTimer = 0;
     }
 
     setSpriteStackDef(stackdef) {
         this.spriteBuffer = new SpriteBuffer(this.spriteSize, this.spriteSize, 360);
         this.renderer = new StackedSprite(stackdef);
+    }
+
+    update(deltaTime) {
+        super.update(deltaTime);
+        this.dustTimer += deltaTime;
+        if(this.dustTimer > 1 / this.dustRate) {
+            this.dustTimer = 0;
+            /*
+            let dustSpeed = this.speed * 0.5;
+            let angle = this.rot + Math.PI + (Math.random() - 0.5) * 0.5;
+            let vx = Math.cos(angle) * dustSpeed;
+            let vy = Math.sin(angle) * dustSpeed;*/
+            this.game.addGameObject(new Particle({
+                x: this.x + Math.random() * 10 - 5 + Math.cos(this.rot) * -20,
+                y: this.y + Math.random() * 10 - 15 + Math.sin(this.rot) * -20,
+                vx: Math.random() * 100 - 10,
+                vy: Math.random() * 100 - 80,
+                ttl: 0.5,
+                color: '#aaaaaa',
+                alpha: 0.2 * (this.speed / this.maxSpeed),
+                size: 10,
+                endSize: 40
+            }));
+        }
     }
 
     render(ctx) {

@@ -26,8 +26,10 @@ document.addEventListener('DOMContentLoaded', () => {
         game.setPlayer1(new Player({x, y, cartype:CABRIO}));
         
         //game.setPlayer2(new Npc({x:x-100, y:y+20, cartype:BOT_A}));
-        //game.addGameObject(new Npc({x:x-200, y:y+40, cartype:BOT_A}));
-        //game.addGameObject(new Npc({x:x-200, y:y-40, cartype:BOT_LIGHTCYCLE}));
+        game.createNpcs = () => {
+            game.addGameObject(new Npc({x:x+20, y:y+80, cartype:BOT_A}));
+            game.addGameObject(new Npc({x:x+200, y:y-40, cartype:BOT_LIGHTCYCLE}));
+        };
     }, {once: true});
     
 });
