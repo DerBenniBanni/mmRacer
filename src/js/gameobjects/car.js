@@ -15,14 +15,16 @@ export class Car extends GameObject{
         this.type = 'Car';
         this.spriteSize = 64;
         this.spriteBuffer = new SpriteBuffer(this.spriteSize, this.spriteSize, 360);
-        this.renderer = new StackedSprite(stackdef);
+        this.stackdef = {...stackdef};
+        this.renderer = new StackedSprite(this.stackdef);
         this.dustRate = 30; // particles per second at max speed
         this.dustTimer = 0;
     }
 
     setSpriteStackDef(stackdef) {
         this.spriteBuffer = new SpriteBuffer(this.spriteSize, this.spriteSize, 360);
-        this.renderer = new StackedSprite(stackdef);
+        this.stackdef = {...stackdef};
+        this.renderer = new StackedSprite(this.stackdef);
     }
 
     update(deltaTime) {

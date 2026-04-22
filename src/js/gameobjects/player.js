@@ -24,10 +24,20 @@ const stackdefs = [
 
 const playerCars = [MINI, COUPE, CABRIO];
 
+// sets of color & colordark
+const colors = [
+    ['d30', 'a00'], // RED
+    ['b60', '750'], //BROWN-ISH
+    ['0a0', '070'], // GREEN
+    ['b0d', '707'], // PURPLE
+    ['00d', '007'], // BLUE
+];
+
 export class Player extends Car {
-    constructor({x,y,rot=0, cartype=MINI}) {
+    constructor({x,y,rot=0, cartype=MINI, playerNumber=1}) {
         super({x,y,rot, stackdef: stackdefs[cartype], maxspeed:600});
         this.type = 'Player';
+        this.playerNumber = playerNumber;
 
         this.vx = 0;
         this.vy = 0;
@@ -37,21 +47,64 @@ export class Player extends Car {
 
         this.skidmarks = 0;
         this.cartype = cartype;
+        this.colorIdx = cartype; // default color
+    }
+
+    collectInputState() {
+        let inputActions = this.game.inputActions;
+        if(!!this.game.player2) {
+            // two player mode, separate controls
+            return {
+                turnLeft: this.playerNumber === 1 ? inputActions.turnLeft1 : inputActions.turnLeft2,
+                turnRight: this.playerNumber === 1 ? inputActions.turnRight1 : inputActions.turnRight2,
+                accelerate: this.playerNumber === 1 ? inputActions.accelerate1 : inputActions.accelerate2,
+                brake: this.playerNumber === 1 ? inputActions.brake1 : inputActions.brake2
+            };
+        } else {
+            // one player mode, shared controls
+            return {
+                turnLeft: inputActions.turnLeft1 || inputActions.turnLeft2,
+                turnRight: inputActions.turnRight1 || inputActions.turnRight2,
+                accelerate: inputActions.accelerate1 || inputActions.accelerate2,
+                brake: inputActions.brake1 || inputActions.brake2
+            };
+        }
+    }
+
+    resetInput(inputAction) {
+        if(this.playerNumber === 1) {
+            this.game.inputActions[inputAction + '1'] = false;
+            if(!!!this.game.player2) {
+                this.game.inputActions[inputAction + '2'] = false;
+            }
+        } else {
+            this.game.inputActions[inputAction + '2'] = false;
+        }
     }
 
     update(deltaTime) {
         super.update(deltaTime);
+        let inputState = this.collectInputState();
         if(this.game.state == STATE_MENU) {
             this.rot += 0.5 * deltaTime;
-            if(this.game.inputActions.turnLeft) {
+            if(inputState.turnLeft) {
                 this.cartype = (this.cartype - 1 + playerCars.length) % playerCars.length;
                 this.setSpriteStackDef(stackdefs[this.cartype]);
-                this.game.inputActions.turnLeft = false; // prevent continuous switching
+                this.resetInput('turnLeft');
             }
-            if(this.game.inputActions.turnRight) {
+            if(inputState.turnRight) {
                 this.cartype = (this.cartype + 1) % playerCars.length;
                 this.setSpriteStackDef(stackdefs[this.cartype]);
-                this.game.inputActions.turnRight = false; // prevent continuous switching
+                this.resetInput('turnRight');
+            }
+            if(inputState.accelerate) {
+                this.colorIdx++;
+                if(this.colorIdx >= colors.length){
+                    this.colorIdx = 0;
+                }
+                let color = colors[this.colorIdx];
+                stackdefs[this.cartype].init(color[0], color[1]);
+                this.resetInput('accelerate');
             }
             return;
         }
@@ -59,12 +112,12 @@ export class Player extends Car {
         // handle input for rotation and acceleration
         let turningPressed = false;
         if(this.speed > 20) {
-            if(this.game.inputActions.turnLeft) {
+            if(inputState.turnLeft) {
                 this.vr -= this.vrRate * deltaTime;
                 turningPressed = true;
                 //this.rot -= Math.PI * deltaTime; // rotate left
             } 
-            if(this.game.inputActions.turnRight) {
+            if(inputState.turnRight) {
                 this.vr += this.vrRate * deltaTime;
                 turningPressed = true;
                 //this.rot += Math.PI * deltaTime; // rotate right
@@ -94,7 +147,7 @@ export class Player extends Car {
             this.rot += 2 * Math.PI;
         }
         
-        if(this.game.inputActions.accelerate) {
+        if(inputState.accelerate) {
             this.speed += 200 * deltaTime; // accelerate
             if(this.speed > this.maxSpeed) {
                 this.speed = this.maxSpeed;
@@ -102,7 +155,7 @@ export class Player extends Car {
                 this.skidmarks = 20;
             }
         }
-        if(this.game.inputActions.brake) {
+        if(inputState.brake) {
             this.speed -= 300 * deltaTime; // brake
             if(this.speed < 0) this.speed = 0;
             this.skidmarks = 20;

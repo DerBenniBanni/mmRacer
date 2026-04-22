@@ -19,3 +19,13 @@ export function addBlocks(stackdef, blocks) {
 }
 
 export const BOX = 1;
+
+export function addTire(blocks, bottom, xCenter, yCenter, diameter, width, color) {
+    let y = yCenter - width/2;
+    let piPart = Math.PI/diameter;
+    for(let i = 0; i < diameter; i++) {
+        let w = 2 * Math.sqrt(diameter*i - i*i);
+        let x = xCenter - w/2;
+        blocks.push([BOX, bottom+i, 1, x, y, w, width, color]);
+    }
+}

@@ -1,3 +1,4 @@
+import { COUPE, Player } from "./gameobjects/player.js";
 import DynamicSplitRenderer from "./lib/dynamicsplit.js";
 import { Vec2d } from "./lib/geometric.js";
 import { HugeBackground } from "./lib/hugebackground.js";
@@ -41,10 +42,6 @@ export class Game {
         };
 
         this.inputActions = {
-            turnLeft: false,
-            turnRight: false,
-            accelerate: false,
-            brake: false
         }
 
         this.track = null;
@@ -62,15 +59,17 @@ export class Game {
 
     registerKeyboardListeners() {
         const keyActions = {
-            'ArrowLeft': 'turnLeft',
-            'KeyA': 'turnLeft',
-            'ArrowRight': 'turnRight',
-            'KeyD': 'turnRight',
-            'ArrowUp': 'accelerate',
-            'KeyW': 'accelerate',
-            'ArrowDown': 'brake',
+            'ArrowLeft': 'turnLeft1',
+            'KeyA': 'turnLeft2',
+            'ArrowRight': 'turnRight1',
+            'KeyD': 'turnRight2',
+            'ArrowUp': 'accelerate1',
+            'KeyW': 'accelerate2',
+            'ArrowDown': 'brake1',
             'KeyS': 'brake',
-            'Space': 'start'
+            'Space': 'start',
+            'Digit1': 'onePlayer',
+            'Digit2': 'twoPlayer',
         };
         window.addEventListener('keydown', (e) => {
             if(keyActions[e.code] !== undefined) {
@@ -97,25 +96,12 @@ export class Game {
 
     generateBackground(trackrenderer) {
         let ctx = this.hugeBackground.getCtx();
-        //this.createWoodTexture(ctx, this.hugeBackground.width, this.hugeBackground.height);
-        //ctx.fillStyle = '#333333';
-        //ctx.fillRect(0, 0, this.hugeBackground.width, this.hugeBackground.height);
+        this.createWoodTexture(ctx, this.hugeBackground.width, this.hugeBackground.height);
 
         if(!!this.track) {
-            //trackrenderer.render(ctx);
+            trackrenderer.render(ctx);
         }
-        // Add some random details to the background
-        /*
-        for (let i = 0; i < 100000; i++) {
-            let x = Math.random() * this.hugeBackground.width;
-            let y = Math.random() * this.hugeBackground.height;
-            let size = Math.random() * 25 + 10;
-            ctx.fillStyle = '#444444' + Math.floor(Math.random() * 20).toString(16);
-            ctx.beginPath();
-            ctx.arc(x, y, size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        */
+        
     }
 
     createWoodTexture(ctx, width, height) {
@@ -161,18 +147,29 @@ export class Game {
     }
 
     setPlayer1(player) {
+        player.playerNumber = 1;
         this.player1 = player;
         this.addGameObject(player);
         this.camera1.target = player;
         this.splitEnabled = !!this.player2;
     }
     setPlayer2(player) {
+        player.playerNumber = 2;
         this.player2 = player;
         this.addGameObject(player);
         this.camera2.target = player;
         this.splitEnabled = !!this.player1;
     }
-
+    removePlayer(playerNumber) {
+        if(playerNumber === 1 && !!this.player1) {
+            this.player1.ttl = 0; // mark for deletion
+            this.player1 = null;
+        } else if(playerNumber === 2 && !!this.player2) {
+            this.player2.ttl = 0; // mark for deletion
+            this.player2 = null;
+        }
+        this.splitEnabled = !!this.player1 && !!this.player2;
+    }
 
     gameLoop(currentTime) {
         let deltaTime = (currentTime - this.lastUpdateTime) / 1000; // in seconds
@@ -193,12 +190,29 @@ export class Game {
     }
 
     update(deltaTime) {
-        if(this.state === STATE_MENU && this.inputActions.start) {
-            this.state = STATE_PLAYING;
-            $addClass("#info", "hidden");
-            this.createNpcs();
-            if(this.player1) this.player1.rot = 0;
-            if(this.player2) this.player2.rot = 0;
+        if(this.state === STATE_MENU) {
+            if(this.inputActions.start) {
+                this.state = STATE_PLAYING;
+                $addClass("#info", "hidden");
+                this.createNpcs();
+                if(this.player1) this.player1.rot = 0;
+                if(this.player2) this.player2.rot = 0;
+            }
+            
+            if(this.inputActions.onePlayer) {
+                if(!!this.player2) {
+                    this.player1.y+=40;
+                }
+                this.removePlayer(2);
+            }
+            if(this.inputActions.twoPlayer) {
+                if(!this.player2) {
+                    let x = this.player1.x;
+                    let y = this.player1.y+80;
+                    this.player1.y-=40;
+                    this.setPlayer2(new Player({x: x, y: y, rot: 0, cartype: COUPE, playerNumber: 2}));
+                }
+            }
         }
         for (let obj of this.gameobjects) {
             if (obj.update) {
