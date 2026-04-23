@@ -67,7 +67,7 @@ export class TrackRenderer {
             }
         });
         // start/finish line
-        //calculate angel of the fisrt segment
+        //calculate angel of the first segment
         let angle = Math.atan2(points[1].y - points[0].y, points[1].x - points[0].x);
         ctx.save();
         ctx.translate(points[0].x, points[0].y);

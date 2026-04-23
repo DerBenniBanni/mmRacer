@@ -1,10 +1,15 @@
-import {addBlocks, addBox, addTire, BOX} from "./stackdef.js";
+import {addTire, BOX} from "./stackdef.js";
+import {StackDefinition} from "./stackdefinition.js";
 
-const stackDefCarMini = {
-    width:60,
-    height:30,
-    layers: [],
-    init: function(col = 'd30', coldark = 'a00') {
+export class StackDefMini extends StackDefinition {
+    constructor() {
+        super(60,30, 64);
+    }
+
+    init(colors) {
+        super.init(colors);
+        const col = colors[0];
+        const coldark = colors[1];
         const glass = '0077aa55';
         const tire = '000';
         const bumper = '222';
@@ -52,7 +57,7 @@ const stackDefCarMini = {
 
         addTire(blocks, 0, 11, 1, 10, 3, tire);
         addTire(blocks, 2, 11, 1, 6, 4, rim);
-        
+
         // front tires
         addTire(blocks, 0, 49, 29, 10, 3, tire);
         addTire(blocks, 2, 49, 29, 6, 4, rim);
@@ -91,17 +96,7 @@ const stackDefCarMini = {
         blocks.push([BOX, 7, 4,-1, 2, 2, 5, breakslight]);
         blocks.push([BOX, 7, 4,-1, 23, 2, 5, breakslight]);
 
-        addBlocks(this, blocks);
+        this.addBlocks( blocks);
+
     }
-};
-
-
-
-const col = 'd30';
-const coldark = 'a00';
-
-stackDefCarMini.init(col, coldark);
-
-
-export default stackDefCarMini;
-export {stackDefCarMini};
+}

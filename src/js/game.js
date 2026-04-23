@@ -7,6 +7,7 @@ import {TrackRenderer} from "./tracks/trackrenderer.js";
 
 export const STATE_MENU = 0;
 export const STATE_PLAYING = 1;
+export const STATE_WINNER = 2;
 
 export class Game {
     constructor() {
@@ -74,11 +75,13 @@ export class Game {
         window.addEventListener('keydown', (e) => {
             if(keyActions[e.code] !== undefined) {
                 this.inputActions[keyActions[e.code]] = true;
+                e.preventDefault();
             }
         });
         window.addEventListener('keyup', (e) => {
             if(keyActions[e.code] !== undefined) {
                 this.inputActions[keyActions[e.code]] = false;
+                e.preventDefault();
             }
         });
     }
@@ -208,10 +211,42 @@ export class Game {
             if(this.inputActions.twoPlayer) {
                 if(!this.player2) {
                     let x = this.player1.x;
-                    let y = this.player1.y+80;
+                    let y = this.player1.y+40;
                     this.player1.y-=40;
                     this.setPlayer2(new Player({x: x, y: y, rot: 0, cartype: COUPE, playerNumber: 2}));
                 }
+            }
+        }
+        if(this.state === STATE_WINNER) {
+            if(this.inputActions.start) {
+                let x = this.track.points[0][0]-200;
+                let y = this.track.points[0][1];
+                this.player1.x = x;
+                this.player1.y = y;
+                if(!!this.player2) {
+                    this.player1.y-=40;
+                    this.player2.x = x;
+                    this.player2.y = y+40;
+                }
+                this.state = STATE_MENU;
+                this.gameobjects = this.gameobjects.filter(o => o.type === 'Player');
+                this.inputActions.start = false;
+                $addClass('#winner', 'hidden');
+                return;
+            }
+        }
+        if(this.state === STATE_PLAYING) {
+            let winner = null;
+            if(this.player1.laps > 1) {
+                winner = "Player 1";
+            } else if(!!this.player2 && this.player2.laps > 1) {
+                winner = "Player 2";
+            }
+            if(!!winner) {
+                $removeClass('#winner', 'hidden');
+                $setText('#result', 'Winner: ' + winner);
+                this.state = STATE_WINNER;
+                return;
             }
         }
         for (let obj of this.gameobjects) {

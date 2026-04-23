@@ -1,10 +1,15 @@
-import {addBlocks, addBox, addTire, BOX} from "./stackdef.js";
+import {addTire, BOX} from "./stackdef.js";
+import {StackDefinition} from "./stackdefinition.js";
 
-const stackDefCarCoupe = {
-    width:60,
-    height:30,
-    layers: [],
-    init: function(col = 'b60', coldark = '750') {
+export class StackDefCoupe extends StackDefinition {
+    constructor() {
+        super(60,30, 64);
+    }
+
+    init(colors) {
+        super.init(colors);
+        const col = colors[0];
+        const coldark = colors[1];
         const glass = '0077aa55';
         const tire = '000';
         const bumper = '222';
@@ -13,7 +18,7 @@ const stackDefCarCoupe = {
         const breakslight = 'f00';
         const shadow = '00000011';
 
-        
+
         let blocks = [];
 
         /** Shadows */
@@ -53,7 +58,7 @@ const stackDefCarCoupe = {
 
         addTire(blocks, 0, 11, 0, 10, 3, tire);
         addTire(blocks, 2, 11, 0, 6, 4, rim);
-        
+
         // front tires
         addTire(blocks, 0, 49, 30, 10, 3, tire);
         addTire(blocks, 2, 49, 30, 6, 4, rim);
@@ -91,11 +96,6 @@ const stackDefCarCoupe = {
         blocks.push([BOX, 7, 4,-1, 2, 2, 5, breakslight]);
         blocks.push([BOX, 7, 4,-1, 23, 2, 5, breakslight]);
 
-        addBlocks(this, blocks);
+        this.addBlocks(blocks);
     }
-};
-
-stackDefCarCoupe.init();
-
-export default stackDefCarCoupe;
-export {stackDefCarCoupe};
+}

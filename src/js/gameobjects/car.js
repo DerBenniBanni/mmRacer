@@ -4,7 +4,7 @@ import StackedSprite from "../renderer/stackedsprite.js";
 import { Particle } from "./particle.js";
 
 export class Car extends GameObject{
-    constructor({x, y, maxspeed, stackdef, rot=0}) {
+    constructor({x, y, maxspeed, rot=0}) {
         super({x,y});
         this.rot = rot; // rotation in radians
         this.w = 60;
@@ -13,18 +13,19 @@ export class Car extends GameObject{
         this.maxSpeed = maxspeed;
 
         this.type = 'Car';
-        this.spriteSize = 64;
-        this.spriteBuffer = new SpriteBuffer(this.spriteSize, this.spriteSize, 360);
-        this.stackdef = {...stackdef};
-        this.renderer = new StackedSprite(this.stackdef);
+        this.spriteSize = 1;
+        this.spriteBuffer = null;
+        this.stackDefInstance = null;
+        this.renderer = null;
         this.dustRate = 30; // particles per second at max speed
         this.dustTimer = 0;
     }
 
-    setSpriteStackDef(stackdef) {
+    setSpriteStackDef(stackDefInstance) {
+        this.spriteSize = stackDefInstance.spriteSize;
         this.spriteBuffer = new SpriteBuffer(this.spriteSize, this.spriteSize, 360);
-        this.stackdef = {...stackdef};
-        this.renderer = new StackedSprite(this.stackdef);
+        this.stackDefInstance = stackDefInstance;
+        this.renderer = new StackedSprite(this.stackDefInstance);
     }
 
     update(deltaTime) {
@@ -52,6 +53,9 @@ export class Car extends GameObject{
     }
 
     render(ctx) {
+        if(!this.renderer) {
+            return;
+        }
         let degree = Math.round(this.rot * 180 / Math.PI) % 360;
         if(degree < 0) {
             degree += 360;

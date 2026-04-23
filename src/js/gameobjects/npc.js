@@ -1,29 +1,20 @@
 import {Car} from "./car.js";
-import stackDefCarMini from "../spritestacks/car_mini.js";
-import stackDefCarCoupe from "../spritestacks/car_coupe.js";
-import stackDefCarCabrio from "../spritestacks/car_cabrio.js";
 import { Circle } from "../lib/geometric.js";
 import { checkCirclesCollision } from "../lib/collisions.js";
-import stackDefBotA from "../spritestacks/car_bot_a.js";
-import stackDefBotLightcycle from "../spritestacks/car_bot_lightcycle.js";
+import {StackDefBotA} from "../spritestacks/car_bot_a.js";
+import {StackDefBotLightcycle} from "../spritestacks/car_bot_lightcycle.js";
 
-export const MINI = 0;
-export const COUPE = 1;
-export const CABRIO = 2;
-export const BOT_A = 3;
-export const BOT_LIGHTCYCLE = 4;
+export const BOT_A = 0;
+export const BOT_LIGHTCYCLE = 1;
 
 const stackdefs = [
-    stackDefCarMini,
-    stackDefCarCoupe,
-    stackDefCarCabrio,
-    stackDefBotA,
-    stackDefBotLightcycle
+    StackDefBotA,
+    StackDefBotLightcycle
 ];
 
 
 export class Npc extends Car {
-    constructor({x, y, rot=0, cartype=MINI}) {
+    constructor({x, y, rot=0, cartype=BOT_A}) {
         super({x,y,rot, stackdef: stackdefs[cartype], maxspeed:500});
         this.type = 'Player';
 
@@ -35,6 +26,14 @@ export class Npc extends Car {
         this.vrRate = 8;
 
         this.target = null;
+        this.cartype = cartype;
+        this.refreshSprite();
+    }
+
+    refreshSprite() {
+        let stackDefInstance = new stackdefs[this.cartype]();
+        stackDefInstance.init();
+        this.setSpriteStackDef(stackDefInstance);
     }
 
     update(deltaTime) {
@@ -82,22 +81,7 @@ export class Npc extends Car {
             this.rot += 2 * Math.PI;
         }
 
-        /*
-        if(this.game.inputActions.turnLeft) {
-            this.rot -= Math.PI * deltaTime; // rotate left
-        }
-        if(this.game.inputActions.turnRight) {
-            this.rot += Math.PI * deltaTime; // rotate right
-        }
-        if(this.game.inputActions.accelerate) {
-            this.speed += 200 * deltaTime; // accelerate
-            if(this.speed > this.maxSpeed) this.speed = this.maxSpeed;
-        }
-        if(this.game.inputActions.brake) {
-            this.speed -= 300 * deltaTime; // brake
-            if(this.speed < 0) this.speed = 0;
-        }
-        */
+
         this.vx = Math.cos(this.rot) * this.speed;
         this.vy = Math.sin(this.rot) * this.speed;
         this.x += this.vx * deltaTime;

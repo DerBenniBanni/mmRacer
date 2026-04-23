@@ -1,12 +1,12 @@
 import { Game } from "./js/game.js";
-import {Player} from "./js/gameobjects/player.js";
+import {Player, CABRIO} from "./js/gameobjects/player.js";
 import {desktrack} from "./js/tracks/desktrack.js";
-import {BOT_A, BOT_LIGHTCYCLE, CABRIO, COUPE, MINI, Npc} from "./js/gameobjects/npc.js";
+import {Npc, BOT_A, BOT_LIGHTCYCLE} from "./js/gameobjects/npc.js";
 
 window.$ = (selector) => document.querySelector(selector);
 window.$removeClass = (selector, className) => $(selector).classList.remove(className);
 window.$addClass = (selector, className) => $(selector).classList.add(className);
-
+window.$setText = (selector, text) => {$(selector).innerText = text;}
 
 let game = null;
 document.addEventListener('DOMContentLoaded', () => {
