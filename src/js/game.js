@@ -3,6 +3,7 @@ import DynamicSplitRenderer from "./lib/dynamicsplit.js";
 import { Vec2d } from "./lib/geometric.js";
 import { HugeBackground } from "./lib/hugebackground.js";
 import { PositionGrid } from "./lib/positiongrid.js";
+import SFXPlayer from "./lib/soundbox/sfxplayer.js";
 import {TrackRenderer} from "./tracks/trackrenderer.js";
 
 export const STATE_MENU = 0;
@@ -16,6 +17,8 @@ export class Game {
         this.debug = false;
         this.canvas = document.getElementById('maincanvas');
         this.ctx = this.canvas.getContext('2d');
+
+        this.sfxPlayer = new SFXPlayer(); // Sound effect player
 
         this.state = STATE_MENU;
         this.gameobjects = [];
@@ -223,17 +226,19 @@ export class Game {
                 let y = this.track.points[0][1];
                 this.player1.x = x;
                 this.player1.y = y;
+                this.player1.reset();
                 if(!!this.player2) {
                     this.player1.y-=40;
                     this.player2.x = x;
                     this.player2.y = y+40;
+                    this.player2.reset();
                 }
                 this.state = STATE_MENU;
                 this.gameobjects = this.gameobjects.filter(o => o.type === 'Player');
                 this.inputActions.start = false;
                 $addClass('#winner', 'hidden');
-                return;
             }
+            return;
         }
         if(this.state === STATE_PLAYING) {
             let winner = null;

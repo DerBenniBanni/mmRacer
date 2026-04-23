@@ -52,6 +52,16 @@ export class Player extends Car {
         this.refreshSprite();
     }
 
+    reset() {
+        this.vx = 0;
+        this.vy = 0;
+        this.vr = 0;
+        this.speed = 0;
+        this.laps = 0;
+        this.checkpoint = null;
+        this.checkpointIndex = -1;
+    }
+
     refreshSprite() {
         let stackDefInstance = new stackdefs[this.cartype]();
         stackDefInstance.init(colors[this.colorIdx]);
