@@ -15,6 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
     //game.debug = true;
     game.setTrack(desktrack);
     game.sfxPlayer.add("gamemusic", musicGame, true);
+
     $addClass("#prerender", "hidden");
     $removeClass("#start", "hidden");
     document.body.addEventListener("click", () => {

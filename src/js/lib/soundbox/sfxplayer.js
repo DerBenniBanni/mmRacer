@@ -8,46 +8,29 @@ export default class SFXPlayer {
         let musicplayer = new SoundBoxPlayer();
         musicplayer.init(data);
         while(musicplayer.generate() < 1) {}
-        let wave = musicplayer.createWave();
-        this.sfx[name] = document.createElement("audio");
-        this.sfx[name].src = URL.createObjectURL(new Blob([wave], {type: "audio/wav"}));
-        this.sfx[name].loop = loop;
-        if(loop) {
-            this.sfx[name].addEventListener('timeupdate', function(){
-                let buffer = .15
-                if(this.currentTime > this.duration - buffer){
-                    this.currentTime = 0;
-                    this.play();
-                }
-            });
-        }
-        
+        this.sfx[name] = {};
+        this.sfx[name].actx = new AudioContext();
+        let self = this;
+        this.sfx[name].actx.decodeAudioData(musicplayer.createWave().buffer, (audioBuffer) => {
+            self.sfx[name].srcNode = self.sfx[name].actx.createBufferSource();
+            self.sfx[name].srcNode.buffer = audioBuffer;
+            self.sfx[name].srcNode.connect(self.sfx[name].actx.destination);
+            self.sfx[name].srcNode.loop = loop;
+        });
     }
 
     playAudio(audioname, restart = true) {
         let audio = this.sfx[audioname];
         if(audio) {
-            if(restart || audio.paused) {
-                audio.currentTime = 0;
-                audio.play();
-            }
+            audio.srcNode.start(0);
         }
     }
     
     stopAudio(audioname) {
         let audio = this.sfx[audioname];
         if(audio) {
-            audio.pause();
-            audio.currentTime = 0;
+            audio.srcNode.stop();
         }
-    }
-    
-    isPlaying(audioname) {
-        let audio = this.sfx[audioname];
-        if(audio) {
-            return !audio.paused;
-        }
-        return false;
     }
     
 }
