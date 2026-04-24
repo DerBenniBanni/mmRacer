@@ -30,6 +30,8 @@ export class Game {
         this.splitRenderer = new DynamicSplitRenderer(this.canvas);
         this.splitEnabled = false;
 
+        this.lapsToWin = 3;
+
         this.camera1 = { 
             x: this.canvas.width / 2, 
             y: this.canvas.height / 2,
@@ -237,14 +239,15 @@ export class Game {
                 this.gameobjects = this.gameobjects.filter(o => o.type === 'Player');
                 this.inputActions.start = false;
                 $addClass('#winner', 'hidden');
+                $removeClass('#info', 'hidden');
             }
             return;
         }
         if(this.state === STATE_PLAYING) {
             let winner = null;
-            if(this.player1.laps > 1) {
+            if(this.player1.laps > this.lapsToWin ) {
                 winner = "Player 1";
-            } else if(!!this.player2 && this.player2.laps > 1) {
+            } else if(!!this.player2 && this.player2.laps > this.lapsToWin ) {
                 winner = "Player 2";
             }
             if(!!winner) {

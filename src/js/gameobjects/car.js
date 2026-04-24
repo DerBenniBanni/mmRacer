@@ -1,4 +1,5 @@
 import {GameObject} from "../lib/gameobject.js";
+import { Rectangle } from "../lib/geometric.js";
 import {SpriteBuffer} from "../lib/spritebuffer.js";
 import StackedSprite from "../renderer/stackedsprite.js";
 import { Particle } from "./particle.js";
@@ -19,6 +20,10 @@ export class Car extends GameObject{
         this.renderer = null;
         this.dustRate = 30; // particles per second at max speed
         this.dustTimer = 0;
+    }
+    
+    getRectangle() {
+        return new Rectangle({x:this.x, y:this.y, width:this.w, height:this.h, rotation:this.rot});
     }
 
     setSpriteStackDef(stackDefInstance) {

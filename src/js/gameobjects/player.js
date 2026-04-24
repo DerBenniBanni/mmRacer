@@ -205,6 +205,11 @@ export class Player extends Car {
             } else {
                 this.skidmarks = 20;
             }
+        } else {
+            this.speed -= 70 * deltaTime
+            if(this.speed < 0) {
+                this.speed = 0;
+            }
         }
         if(inputState.brake) {
             this.speed -= 300 * deltaTime; // brake

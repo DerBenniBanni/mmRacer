@@ -16,7 +16,7 @@ const stackdefs = [
 export class Npc extends Car {
     constructor({x, y, rot=0, cartype=BOT_A}) {
         super({x,y,rot, stackdef: stackdefs[cartype], maxspeed:500});
-        this.type = 'Player';
+        this.type = 'Npc';
 
         this.vx = 0;
         this.vy = 0;
