@@ -5,12 +5,11 @@ import {StackDefCabrio} from "../spritestacks/car_cabrio.js";
 import { checkCirclePointCollision, checkVec2dRectangleCollision } from "../lib/collisions.js";
 import {Circle, Rectangle, Vec2d} from "../lib/geometric.js";
 import { STATE_MENU } from "../game.js";
+import { Particle } from "./particle.js";
 
 export const MINI = 0;
 export const COUPE = 1;
 export const CABRIO = 2;
-export const BOT_A = 3;
-export const BOT_LIGHTCYCLE = 4;
 
 const stackdefs = [
     StackDefMini,
@@ -193,23 +192,20 @@ export class Player extends Car {
         // check for collisions with NPC cars
         let myPos = new Vec2d(nextX, nextY);
         for(let other of this.otherCars) {
-            let collides = checkCirclePointCollision(new Circle(other.x, other.y,20), myPos);
+            let collides = checkCirclePointCollision(new Circle(other.x, other.y, 30), myPos);
             if(collides) {
                 this.speed *= 0.7;
-                /*
-                let otherPos = new Vec2d(other.x, other.y);
-                let angle = otherPos.sub(myPos).angle();
-                let collAngle = angle-this.rot;
-                console.log(collAngle);
-                if(Math.abs(collAngle < 1)) {
-                    this.rot -= collAngle * 0.5;
-                    this.speed *= 0.7;
-                    this.vx = Math.cos(this.rot) * this.speed;
-                    this.vy = Math.sin(this.rot) * this.speed;
-                    nextX = this.x + this.vx * deltaTime;
-                    nextY = this.y + this.vy * deltaTime;
-                }
-                */
+                this.game.addGameObject(new Particle({
+                        x: this.x + Math.random() * 10 - 5 + Math.cos(this.rot) * -20,
+                        y: this.y + Math.random() * 10 - 15 + Math.sin(this.rot) * -20,
+                        vx: Math.random() * 100 - 10,
+                        vy: Math.random() * 100 - 80,
+                        ttl: 0.5,
+                        color: '#ffff00',
+                        alpha: 0.5,
+                        size: 10,
+                        endSize: 40
+                    }));
                 break;
             }
         }

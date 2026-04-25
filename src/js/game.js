@@ -1,3 +1,4 @@
+import { BOT_A, BOT_LIGHTCYCLE, Npc } from "./gameobjects/npc.js";
 import { COUPE, Player } from "./gameobjects/player.js";
 import DynamicSplitRenderer from "./lib/dynamicsplit.js";
 import { Vec2d } from "./lib/geometric.js";
@@ -6,9 +7,10 @@ import { PositionGrid } from "./lib/positiongrid.js";
 import SFXPlayer from "./lib/soundbox/sfxplayer.js";
 import {TrackRenderer} from "./tracks/trackrenderer.js";
 
-export const STATE_MENU = 0;
-export const STATE_PLAYING = 1;
-export const STATE_WINNER = 2;
+export const STATE_CLICKTOSTART = 0;
+export const STATE_MENU = 1;
+export const STATE_PLAYING = 2;
+export const STATE_WINNER = 3;
 
 export class Game {
     constructor() {
@@ -20,7 +22,7 @@ export class Game {
 
         this.sfxPlayer = new SFXPlayer(); // Sound effect player
 
-        this.state = STATE_MENU;
+        this.state = STATE_CLICKTOSTART;
         this.gameobjects = [];
 
         this.positionGrid = new PositionGrid(150, this.bgWidth, this.bgHeight);
@@ -57,13 +59,19 @@ export class Game {
 
         this.hugeBackground = new HugeBackground(this.bgWidth, this.bgHeight, 0, 0);
         this.trackBackground = new HugeBackground(this.bgWidth, this.bgHeight, 0, 0);
-        
-        this.createNpcs = () => {}; // placeholder function to create NPCs after track is loaded
 
         this.registerKeyboardListeners();
 
         this.lastUpdateTime = performance.now();
         requestAnimationFrame(this.gameLoop.bind(this));
+    }
+
+    createNpcs() {
+        let x = this.track.points[0][0];
+        let y = this.track.points[0][1];
+        this.addGameObject(new Npc({x:x-150, y:y+80, cartype:BOT_A}));
+        this.addGameObject(new Npc({x:x, y:y, cartype:BOT_LIGHTCYCLE}));
+        this.addGameObject(new Npc({x:x-100, y:y-80, cartype:BOT_A}));
     }
 
     registerKeyboardListeners() {
@@ -98,6 +106,7 @@ export class Game {
     setTrack(trackIdx) {
         this.trackIdx = trackIdx;
         this.track = this.tracks[trackIdx];
+        $setText('#track', this.track.t);
         let trackrenderer = new TrackRenderer(this.track);
         trackrenderer.render(this.trackBackground.getCtx());
         this.trackBounds = trackrenderer.generateTrackBounds();
@@ -340,7 +349,9 @@ export class Game {
     renderCameraView(ctx, camera) {
         let shrinkTrack = this.state === STATE_MENU;
         this.hugeBackground.render(ctx, camera.x, camera.y, this.canvas.width, this.canvas.height);
-        this.trackBackground.render(ctx, camera.x, camera.y, this.canvas.width, this.canvas.height, shrinkTrack);
+        if(this.state > STATE_CLICKTOSTART){
+            this.trackBackground.render(ctx, camera.x, camera.y, this.canvas.width, this.canvas.height, shrinkTrack);
+        }
         ctx.save();
         ctx.translate(this.canvas.width / 2 - camera.x, this.canvas.height / 2 - camera.y);
         for (let obj of this.gameobjects) {
@@ -363,7 +374,7 @@ export class Game {
         
         this.splitRenderer.setAngle(angleBetweenPlayers+Math.PI/2);
         let renderObjects = this.gameobjects.filter(obj => obj.render);
-        let hugeBackground = this.hugeBackground;
+        let bgs = [this.hugeBackground, this.trackBackground];
         let camera1 = this.camera1;
         let camera2 = this.camera2;
         let canvasWidth = this.canvas.width;
@@ -376,10 +387,11 @@ export class Game {
             this.splitRenderer.render(ctx, distanceFactor,
                 (ctx) => {
                     // Render the player 1 side
-                    hugeBackground.render(ctx, 
+                    bgs.forEach(bg => bg.render(ctx, 
                         game.player1.x-player1ScreenPos.x + canvasWidth/2, 
                         game.player1.y-player1ScreenPos.y + canvasHeight/2, 
-                        canvasWidth, canvasHeight);
+                        canvasWidth, canvasHeight));
+
                     ctx.save();
                     ctx.translate(player1ScreenPos.x - game.player1.x, player1ScreenPos.y - game.player1.y);
                     renderObjects.forEach((gameObject) => {
@@ -391,10 +403,10 @@ export class Game {
                 (ctx) => {
                     // Render the player 2 side
                     
-                    hugeBackground.render(ctx, 
+                    bgs.forEach(bg => bg.render(ctx, 
                         game.player2.x-player2ScreenPos.x + canvasWidth/2, 
                         game.player2.y-player2ScreenPos.y + canvasHeight/2, 
-                        canvasWidth, canvasHeight);
+                        canvasWidth, canvasHeight));
                     ctx.save();
                     ctx.translate(player2ScreenPos.x - game.player2.x, player2ScreenPos.y - game.player2.y);
                     renderObjects.forEach((gameObject) => {
@@ -405,10 +417,10 @@ export class Game {
                 }
             );
         } else {
-            hugeBackground.render(ctx, 
+            bgs.forEach(bg => bg.render(ctx, 
                         centerPoint.x + canvasWidth/2 - center.x, 
                         centerPoint.y + canvasHeight/2 - center.y, 
-                        canvasWidth, canvasHeight);
+                        canvasWidth, canvasHeight));
             ctx.save();
             ctx.translate(-centerPoint.x + ctx.canvas.width/2, -centerPoint.y + ctx.canvas.height/2);
             renderObjects.forEach((gameObject) => {

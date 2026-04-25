@@ -1,4 +1,4 @@
-import { Game } from "./js/game.js";
+import { Game, STATE_MENU } from "./js/game.js";
 import {Player, CABRIO} from "./js/gameobjects/player.js";
 import {tracks} from "./js/tracks/desktrack.js";
 import {Npc, BOT_A, BOT_LIGHTCYCLE} from "./js/gameobjects/npc.js";
@@ -30,11 +30,8 @@ document.addEventListener('DOMContentLoaded', () => {
         
         game.setPlayer1(new Player({x, y, cartype:CABRIO}));
         game.sfxPlayer.playAudio("gamemusic");
-        //game.setPlayer2(new Npc({x:x-100, y:y+20, cartype:BOT_A}));
-        game.createNpcs = () => {
-            game.addGameObject(new Npc({x:x+20, y:y+80, cartype:BOT_A}));
-            game.addGameObject(new Npc({x:x+200, y:y-40, cartype:BOT_LIGHTCYCLE}));
-        };
+
+        game.state = STATE_MENU;
     }, {once: true});
     
 });

@@ -30,6 +30,13 @@ body {
 .center {
     text-align: center;
 }
+.bottom{
+    position: absolute;
+    width: 100%;
+    bottom:0;
+    margin-bottom:5vh;
+}
+
 
 .metal {
     background: linear-gradient(180deg, #0011cf 0%, #31bdf5 35%, #ffffff 55%, #000000 57%, #ebaa1d 100%);
