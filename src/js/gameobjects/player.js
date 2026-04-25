@@ -45,9 +45,6 @@ export class Player extends Car {
         this.cartype = cartype;
         this.colorIdx = cartype; // default color
 
-        this.laps = 0;
-        this.checkpoint = null;
-        this.checkpointIndex = -1;
 
         this.refreshSprite();
     }
@@ -129,36 +126,7 @@ export class Player extends Car {
             }
             return;
         }
-        if(!!this.game.track) {
-            if(!!this.checkpoint) {
-                let collision = checkVec2dRectangleCollision(new Vec2d(this.x, this.y), this.checkpoint);
-                if(collision) {
-                    if(this.checkpointIndex === 0) {
-                        this.laps++;
-                        this.updatePlayerInfo();
-                    }
-                    this.checkpoint = null;
-                }
-            }
-            if (!!!this.checkpoint) {
-                let trackpoints = this.game.track.points;
-                this.checkpointIndex++;
-                if (this.checkpointIndex >= trackpoints.length) {
-                    this.checkpointIndex = 0;
-                }
-                let p = trackpoints[this.checkpointIndex];
-                let p2 = trackpoints[(this.checkpointIndex + 1) % trackpoints.length];
-                let angle = Math.atan2(p2[1] - p[1], p2[0] - p[0]);
-                this.checkpoint = new Rectangle({
-                    x: p[0],
-                    y: p[1],
-                    width: 50,
-                    height: 600,
-                    rotation: angle
-                });
-
-            }
-        }
+        
         this.skidmarks = 0;
         // handle input for rotation and acceleration
         let turningPressed = false;

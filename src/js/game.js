@@ -30,7 +30,7 @@ export class Game {
         this.splitRenderer = new DynamicSplitRenderer(this.canvas);
         this.splitEnabled = false;
 
-        this.lapsToWin = 3;
+        this.lapsToWin = 1;
 
         this.camera1 = { 
             x: this.canvas.width / 2, 
@@ -249,6 +249,14 @@ export class Game {
                 winner = "Player 1";
             } else if(!!this.player2 && this.player2.laps > this.lapsToWin ) {
                 winner = "Player 2";
+            } else {
+                let npcWon = this.gameobjects.find(o => o.type === 'Npc' && o.laps > this.lapsToWin);
+                if(npcWon) {
+                    $removeClass('#winner', 'hidden');
+                    $setText('#result', 'The MACHINES won!');
+                    this.state = STATE_WINNER;
+                    return;    
+                }
             }
             if(!!winner) {
                 $removeClass('#winner', 'hidden');

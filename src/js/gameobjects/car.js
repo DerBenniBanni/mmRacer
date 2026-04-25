@@ -1,5 +1,6 @@
+import { checkVec2dRectangleCollision } from "../lib/collisions.js";
 import {GameObject} from "../lib/gameobject.js";
-import { Rectangle } from "../lib/geometric.js";
+import { Rectangle, Vec2d } from "../lib/geometric.js";
 import {SpriteBuffer} from "../lib/spritebuffer.js";
 import StackedSprite from "../renderer/stackedsprite.js";
 import { Particle } from "./particle.js";
@@ -20,6 +21,11 @@ export class Car extends GameObject{
         this.renderer = null;
         this.dustRate = 30; // particles per second at max speed
         this.dustTimer = 0;
+
+        
+        this.laps = 0;
+        this.checkpoint = null;
+        this.checkpointIndex = -1;
     }
     
     getRectangle() {
@@ -35,14 +41,14 @@ export class Car extends GameObject{
 
     update(deltaTime) {
         super.update(deltaTime);
+        this.handleCheckpoints();
+        this.handleDust(deltaTime);
+    }
+
+    handleDust(deltaTime) {
         this.dustTimer += deltaTime;
-        if(this.dustTimer > 1 / this.dustRate) {
+        if (this.dustTimer > 1 / this.dustRate) {
             this.dustTimer = 0;
-            /*
-            let dustSpeed = this.speed * 0.5;
-            let angle = this.rot + Math.PI + (Math.random() - 0.5) * 0.5;
-            let vx = Math.cos(angle) * dustSpeed;
-            let vy = Math.sin(angle) * dustSpeed;*/
             this.game.addGameObject(new Particle({
                 x: this.x + Math.random() * 10 - 5 + Math.cos(this.rot) * -20,
                 y: this.y + Math.random() * 10 - 15 + Math.sin(this.rot) * -20,
@@ -54,6 +60,42 @@ export class Car extends GameObject{
                 size: 10,
                 endSize: 40
             }));
+        }
+    }
+    updatePlayerInfo() {
+        // override in implementation
+    }
+
+    handleCheckpoints() {
+        if (!!this.game.track) {
+            if (!!this.checkpoint) {
+                let collision = checkVec2dRectangleCollision(new Vec2d(this.x, this.y), this.checkpoint);
+                if (collision) {
+                    if (this.checkpointIndex === 0) {
+                        this.laps++;
+                        this.updatePlayerInfo();
+                    }
+                    this.checkpoint = null;
+                }
+            }
+            if (!!!this.checkpoint) {
+                let trackpoints = this.game.track.points;
+                this.checkpointIndex++;
+                if (this.checkpointIndex >= trackpoints.length) {
+                    this.checkpointIndex = 0;
+                }
+                let p = trackpoints[this.checkpointIndex];
+                let p2 = trackpoints[(this.checkpointIndex + 1) % trackpoints.length];
+                let angle = Math.atan2(p2[1] - p[1], p2[0] - p[0]);
+                this.checkpoint = new Rectangle({
+                    x: p[0],
+                    y: p[1],
+                    width: 50,
+                    height: 600,
+                    rotation: angle
+                });
+
+            }
         }
     }
 
