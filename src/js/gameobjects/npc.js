@@ -111,7 +111,7 @@ export class Npc extends Car {
         if(checkCirclesCollision(targetCircle, carCircle)) {
             this.target.idx = (this.target.idx + 1) % this.game.track.points.length;
             this.target.point = this.getFuzzyTargetPoint(this.target.idx);
-            this.maxSpeed =Math.random()*100 + 520;
+            this.maxSpeed = Math.random()*100 + 520;
         }
 
     }

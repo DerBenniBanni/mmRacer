@@ -2,8 +2,8 @@ import {Car} from "./car.js";
 import {StackDefMini} from "../spritestacks/car_mini.js";
 import {StackDefCoupe} from "../spritestacks/car_coupe.js";
 import {StackDefCabrio} from "../spritestacks/car_cabrio.js";
-import { checkVec2dRectangleCollision } from "../lib/collisions.js";
-import {Rectangle, Vec2d} from "../lib/geometric.js";
+import { checkCirclePointCollision, checkVec2dRectangleCollision } from "../lib/collisions.js";
+import {Circle, Rectangle, Vec2d} from "../lib/geometric.js";
 import { STATE_MENU } from "../game.js";
 
 export const MINI = 0;
@@ -45,6 +45,7 @@ export class Player extends Car {
         this.cartype = cartype;
         this.colorIdx = cartype; // default color
 
+        this.otherCars = [];
 
         this.refreshSprite();
     }
@@ -189,13 +190,36 @@ export class Player extends Car {
         let nextX = this.x + this.vx * deltaTime;
         let nextY = this.y + this.vy * deltaTime;
 
+        // check for collisions with NPC cars
+        let myPos = new Vec2d(nextX, nextY);
+        for(let other of this.otherCars) {
+            let collides = checkCirclePointCollision(new Circle(other.x, other.y,20), myPos);
+            if(collides) {
+                this.speed *= 0.7;
+                /*
+                let otherPos = new Vec2d(other.x, other.y);
+                let angle = otherPos.sub(myPos).angle();
+                let collAngle = angle-this.rot;
+                console.log(collAngle);
+                if(Math.abs(collAngle < 1)) {
+                    this.rot -= collAngle * 0.5;
+                    this.speed *= 0.7;
+                    this.vx = Math.cos(this.rot) * this.speed;
+                    this.vy = Math.sin(this.rot) * this.speed;
+                    nextX = this.x + this.vx * deltaTime;
+                    nextY = this.y + this.vy * deltaTime;
+                }
+                */
+                break;
+            }
+        }
 
         // check for collisions with track boundaries
         let nearbyBoundaries = this.game.positionGrid.getNearby(nextX, nextY, 50);
         for(let boundary of nearbyBoundaries) {
             if(boundary.type === 'Boundary') {
-                let collision = checkVec2dRectangleCollision(new Vec2d(nextX, nextY), boundary);
-                if(collision) {
+                let collides = checkVec2dRectangleCollision(new Vec2d(nextX, nextY), boundary);
+                if(collides) {
                     // reflect the velocity vector based on the boundary normal
                     let velocity = new Vec2d(this.vx, this.vy);
                     let normal = boundary.normal;

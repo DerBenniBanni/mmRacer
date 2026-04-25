@@ -30,7 +30,7 @@ export class Game {
         this.splitRenderer = new DynamicSplitRenderer(this.canvas);
         this.splitEnabled = false;
 
-        this.lapsToWin = 1;
+        this.lapsToWin = 3;
 
         this.camera1 = { 
             x: this.canvas.width / 2, 
@@ -203,8 +203,15 @@ export class Game {
                 this.state = STATE_PLAYING;
                 $addClass("#info", "hidden");
                 this.createNpcs();
-                if(this.player1) this.player1.rot = 0;
-                if(this.player2) this.player2.rot = 0;
+                let filter = (o, player) => (o.type ==='Player' || o.type === 'Npc') && o !== player;
+                if(this.player1) {
+                    this.player1.rot = 0;
+                    this.player1.otherCars = this.gameobjects.filter(o => filter(o, this.player1) );
+                }
+                if(this.player2) {
+                    this.player2.rot = 0;
+                    this.player2.otherCars = this.gameobjects.filter(o => filter(o, this.player2) );
+                }
             }
             
             if(this.inputActions.onePlayer) {
