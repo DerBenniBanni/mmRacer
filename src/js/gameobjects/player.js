@@ -252,28 +252,7 @@ export class Player extends Car {
 
     }
 
-        
-    updateBackground(ctx) {
-        if(this.speed < this.maxSpeed /10) {
-            return;
-        }
-        let len = this.speed/10;
-        ctx.save();
-        ctx.translate(this.x, this.y);
-        ctx.rotate(this.rot);
-        ctx.beginPath();
-        let alpha = this.skidmarks > 0 ? this.skidmarks.toString(16) : '03';
-        ctx.fillStyle = '#000000' + alpha;
-        let x1 = (Math.random() * 4 - 2) - len/2;
-        let y1 = 15 + (Math.random() * 4 - 2);
-        let size1 = Math.random() * 2 + 1;
-        ctx.fillRect(x1, y1, len, 2);
-        let x2 = (Math.random() * 4 - 2) - len/2;
-        let y2 = -15 + (Math.random() * 4 - 2);
-        let size2 = Math.random() * 2 + 1;
-        ctx.fillRect(x2, y2, len, 2);
-        ctx.restore();
-    }
+
 
     render(ctx) {
         super.render(ctx);

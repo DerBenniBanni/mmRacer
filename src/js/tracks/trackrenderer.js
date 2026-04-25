@@ -8,6 +8,7 @@ export class TrackRenderer {
 
 
     render(ctx) {
+        ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
         let points = this.trackdef.points.map(p => {
             return {x:p[0], y:p[1]};
         });

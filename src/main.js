@@ -1,6 +1,6 @@
 import { Game } from "./js/game.js";
 import {Player, CABRIO} from "./js/gameobjects/player.js";
-import {desktrack} from "./js/tracks/desktrack.js";
+import {tracks} from "./js/tracks/desktrack.js";
 import {Npc, BOT_A, BOT_LIGHTCYCLE} from "./js/gameobjects/npc.js";
 import musicGame from "./js/lib/soundbox/music.js";
 
@@ -13,7 +13,9 @@ let game = null;
 document.addEventListener('DOMContentLoaded', () => {
     game = new Game();
     //game.debug = true;
-    game.setTrack(desktrack);
+    game.generateBackground();
+    tracks.forEach(track => game.tracks.push(track));
+    game.setTrack(0);
     game.sfxPlayer.add("gamemusic", musicGame, true);
 
     $addClass("#prerender", "hidden");
@@ -23,8 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
         $addClass("#title", "hidden");
         $removeClass("#ui", "hidden");
         $removeClass("#info", "hidden");
-        let x = desktrack.points[0][0]-200;
-        let y = desktrack.points[0][1];
+        let x = game.track.points[0][0]-200;
+        let y = game.track.points[0][1];
         
         game.setPlayer1(new Player({x, y, cartype:CABRIO}));
         game.sfxPlayer.playAudio("gamemusic");

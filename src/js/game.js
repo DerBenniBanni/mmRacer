@@ -32,6 +32,11 @@ export class Game {
 
         this.lapsToWin = 3;
 
+        this.tracks = [];
+        this.trackIdx = 0;
+        this.track = null;
+        this.trackBounds = [];
+
         this.camera1 = { 
             x: this.canvas.width / 2, 
             y: this.canvas.height / 2,
@@ -50,10 +55,8 @@ export class Game {
         this.inputActions = {
         }
 
-        this.track = null;
-        this.trackBounds = [];
-
         this.hugeBackground = new HugeBackground(this.bgWidth, this.bgHeight, 0, 0);
+        this.trackBackground = new HugeBackground(this.bgWidth, this.bgHeight, 0, 0);
         
         this.createNpcs = () => {}; // placeholder function to create NPCs after track is loaded
 
@@ -76,6 +79,7 @@ export class Game {
             'Space': 'start',
             'Digit1': 'onePlayer',
             'Digit2': 'twoPlayer',
+            'KeyT': 'switchTrack',
         };
         window.addEventListener('keydown', (e) => {
             if(keyActions[e.code] !== undefined) {
@@ -91,25 +95,49 @@ export class Game {
         });
     }
 
-    setTrack(track) {
-        this.track = track;
+    setTrack(trackIdx) {
+        this.trackIdx = trackIdx;
+        this.track = this.tracks[trackIdx];
         let trackrenderer = new TrackRenderer(this.track);
-        this.generateBackground(trackrenderer);
+        trackrenderer.render(this.trackBackground.getCtx());
         this.trackBounds = trackrenderer.generateTrackBounds();
         this.positionGrid.clear();
         this.trackBounds.forEach(boundary => {
             this.positionGrid.addByRectangle(boundary);
         });
+        if(!!this.player1) {
+            let x = this.track.points[0][0]-200;
+            let y = this.track.points[0][1];
+            this.player1.x = x;
+            this.player1.y = y;
+            this.player1.reset();
+            if(!!this.player2) {
+                this.player1.y-=40;
+                this.player2.x = x;
+                this.player2.y = y+40;
+                this.player2.reset();
+            }
+        }
     }
 
+    nextTrack() {
+        this.trackIdx++;
+        if(this.trackIdx >= this.tracks.length) {
+            this.trackIdx = 0;
+        }
+        this.setTrack(this.trackIdx);
+    }
+/*
     generateBackground(trackrenderer) {
         let ctx = this.hugeBackground.getCtx();
         this.createWoodTexture(ctx, this.hugeBackground.width, this.hugeBackground.height);
-
         if(!!this.track) {
             trackrenderer.render(ctx);
         }
-        
+    }
+*/
+    generateBackground() {
+        this.createWoodTexture(this.hugeBackground.getCtx(), this.hugeBackground.width, this.hugeBackground.height);
     }
 
     createWoodTexture(ctx, width, height) {
@@ -190,11 +218,11 @@ export class Game {
     }
 
     updateBackground() {
-        this.hugeBackground.getCtx().save();
-        this.hugeBackground.getCtx().translate(this.hugeBackground.offsetX, this.hugeBackground.offsetY);
+        this.trackBackground.getCtx().save();
+        this.trackBackground.getCtx().translate(this.hugeBackground.offsetX, this.hugeBackground.offsetY);
         this.gameobjects.filter(obj => obj.updateBackground)
-            .forEach(obj => obj.updateBackground(this.hugeBackground.getCtx()));
-        this.hugeBackground.getCtx().restore();
+            .forEach(obj => obj.updateBackground(this.trackBackground.getCtx()));
+        this.trackBackground.getCtx().restore();
     }
 
     update(deltaTime) {
@@ -227,6 +255,11 @@ export class Game {
                     this.player1.y-=40;
                     this.setPlayer2(new Player({x: x, y: y, rot: 0, cartype: COUPE, playerNumber: 2}));
                 }
+            }
+            if(this.inputActions.switchTrack) {
+                this.inputActions.switchTrack = false;
+                this.nextTrack();
+                return;
             }
         }
         if(this.state === STATE_WINNER) {
@@ -289,7 +322,7 @@ export class Game {
     render() {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         this.gameobjects.sort((a, b) => a.y - b.y); // sort by y position
-        if(!this.splitEnabled) {
+        if(this.state == STATE_MENU || !this.splitEnabled) {
             // only render player 1 view if player 2 is not set
             this.renderCameraView(this.ctx, this.camera1);
             return;
@@ -305,7 +338,9 @@ export class Game {
     }
 
     renderCameraView(ctx, camera) {
+        let shrinkTrack = this.state === STATE_MENU;
         this.hugeBackground.render(ctx, camera.x, camera.y, this.canvas.width, this.canvas.height);
+        this.trackBackground.render(ctx, camera.x, camera.y, this.canvas.width, this.canvas.height, shrinkTrack);
         ctx.save();
         ctx.translate(this.canvas.width / 2 - camera.x, this.canvas.height / 2 - camera.y);
         for (let obj of this.gameobjects) {
