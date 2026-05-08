@@ -5,6 +5,8 @@ The game is a loveletter to old games like "Micro Machines", in respect and hono
 
 Play it here: https://derbennibanni.itch.io/m13kro-machines
 
+The code-version for the jam-entry is a separate branch: https://github.com/DerBenniBanni/mmRacer/tree/gamedevjs26_jam_entry
+
 ## Controls:
 Play with 1 Player: use ArrowKeys or WASD to steer the car
 Play with 2 Players: arrow keys for player one, WASD for playe two
