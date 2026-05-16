@@ -119,10 +119,11 @@ export class Car extends GameObject{
     }
     
 
-    updateBackground(ctx) {
+    updateBackground(background) {
         if(this.speed < this.maxSpeed /10) {
             return;
         }
+        let ctx = background.getCtx(this.x, this.y);
         let len = this.speed/10;
         ctx.save();
         ctx.translate(this.x, this.y);

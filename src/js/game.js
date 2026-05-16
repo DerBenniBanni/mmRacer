@@ -108,7 +108,8 @@ export class Game {
         this.track = this.tracks[trackIdx];
         $setText('#track', this.track.t);
         let trackrenderer = new TrackRenderer(this.track);
-        trackrenderer.render(this.trackBackground.getCtx());
+        trackrenderer.render(this.trackBackground.getMainCtx());
+        this.trackBackground.bake();
         this.trackBounds = trackrenderer.generateTrackBounds();
         this.positionGrid.clear();
         this.trackBounds.forEach(boundary => {
@@ -146,7 +147,8 @@ export class Game {
     }
 */
     generateBackground() {
-        this.createWoodTexture(this.hugeBackground.getCtx(), this.hugeBackground.width, this.hugeBackground.height);
+        this.createWoodTexture(this.hugeBackground.getMainCtx(), this.hugeBackground.width, this.hugeBackground.height);
+        this.hugeBackground.bake();
     }
 
     createWoodTexture(ctx, width, height) {
@@ -227,11 +229,8 @@ export class Game {
     }
 
     updateBackground() {
-        this.trackBackground.getCtx().save();
-        this.trackBackground.getCtx().translate(this.hugeBackground.offsetX, this.hugeBackground.offsetY);
         this.gameobjects.filter(obj => obj.updateBackground)
-            .forEach(obj => obj.updateBackground(this.trackBackground.getCtx()));
-        this.trackBackground.getCtx().restore();
+            .forEach(obj => obj.updateBackground(this.trackBackground));
     }
 
     update(deltaTime) {
