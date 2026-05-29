@@ -3,7 +3,7 @@ import {StackDefinition} from "./stackdefinition.js";
 
 export class StackDefMini extends StackDefinition {
     constructor() {
-        super(60,30, 64);
+        super(60,30, 120);
     }
 
     init(colors) {

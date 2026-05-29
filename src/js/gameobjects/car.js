@@ -114,8 +114,6 @@ export class Car extends GameObject{
             this.spriteBuffer.setFinished(degree);
         }
         ctx.drawImage(this.spriteBuffer.get(degree), this.x - spriteOffset, this.y - spriteOffset);
-
-        this.renderer.render(ctx, this.x, this.y, this.rot);
     }
     
 
